@@ -6,7 +6,15 @@
 
 /// @file
 
+
+//********************UnitTests**********************
+void TestSolveSquare();
+
+
+
 const double EPS = 1E-10;
+
+int status_exit = 0;
 
 enum Number_of_roots
 {
@@ -16,9 +24,20 @@ enum Number_of_roots
     two_roots
 };
 
-struct Roots{
+//**********************STRUCTS*********************************
+struct Ans_SolveSquare
+{
+    double a;
+    double b;
+    double c;
+    Number_of_roots n_roots;
     double x1;
     double x2;
+};
+
+struct Roots{
+    double x1 = 0;
+    double x2 = 0;
     Number_of_roots ans_number_of_x;
 };
 
@@ -32,6 +51,15 @@ struct Equation {
     Roots roots;
     Coeffs coeff;
 };
+
+//**********************STRUCTS*********************************
+
+/**
+
+    @brief End of file check function
+**/
+
+int chek_EOF(int status);
 
 /**
 
@@ -104,55 +132,62 @@ void remove_minus_zero(double* num);
 //*********************************MAIN**************************************
 int main(void)
 {
+    TestSolveSquare();
     struct Equation quadratic;
 
     get_square_coeff(&quadratic);
+
+    if (status_exit == 1) {
+        printf("GG WP");
+        return 0;
+    }
 
     solve_square(&quadratic);
 
     print_roots(&quadratic);
 
 }
-//***********************************************************************
+//***************************************************************************
 
 void solve_square(Equation* quadratic)
 {
+    assert(quadratic != NULL);
     assert(isfinite(quadratic->coeff.a));
     assert(isfinite(quadratic->coeff.b));
     assert(isfinite(quadratic->coeff.c));
-    assert(&quadratic->roots.x1 != NULL);
-    assert(&quadratic->roots.x2 != NULL);
+
 
 
     if (double_is_same(quadratic->coeff.a, 0))
         solve_liner(quadratic);
+    else{
 
-    double dis = quadratic->coeff.b * quadratic->coeff.b -
-                        4 * quadratic->coeff.a * quadratic->coeff.c;
+        double dis = quadratic->coeff.b * quadratic->coeff.b -
+                            4 * quadratic->coeff.a * quadratic->coeff.c;
 
-    if (double_is_same(dis, 0)) {
-        quadratic->roots.x1 =  -quadratic->coeff.b / 2 / quadratic->coeff.a;
-        remove_minus_zero(&quadratic->roots.x1);
-        quadratic->roots.ans_number_of_x = one_roots;
-    }
+        if (double_is_same(dis, 0)) {
+            quadratic->roots.x1 =  -quadratic->coeff.b / 2 / quadratic->coeff.a;
+            remove_minus_zero(&quadratic->roots.x1);
+            quadratic->roots.ans_number_of_x = one_roots;
+        }
 
-    if (dis < 0)
-        quadratic->roots.ans_number_of_x = zero_roots;
+        if (dis < 0)
+            quadratic->roots.ans_number_of_x = zero_roots;
 
-    if (dis > 0) {
-        double sqrt_dis = sqrt(dis);
-        quadratic->roots.x1 = (-quadratic->coeff.b + sqrt_dis) / (2 * quadratic->coeff.a);
-        quadratic->roots.x2 = (-quadratic->coeff.b - sqrt_dis) / (2 * quadratic->coeff.a);
-        remove_minus_zero(&quadratic->roots.x1);
-        remove_minus_zero(&quadratic->roots.x2);
-        quadratic->roots.ans_number_of_x = two_roots;
+        if (dis > 0) {
+            double sqrt_dis = sqrt(dis);
+            quadratic->roots.x1 = (-quadratic->coeff.b + sqrt_dis) / (2 * quadratic->coeff.a);
+            quadratic->roots.x2 = (-quadratic->coeff.b - sqrt_dis) / (2 * quadratic->coeff.a);
+            remove_minus_zero(&quadratic->roots.x1);
+            remove_minus_zero(&quadratic->roots.x2);
+            quadratic->roots.ans_number_of_x = two_roots;
+        }
     }
 }
 
 void solve_liner(Equation* quadratic)
 {
-    assert(&quadratic->roots.x1 != NULL);
-
+    assert(quadratic != NULL);
     assert(isfinite(quadratic->coeff.b));
     assert(isfinite(quadratic->coeff.c));
 
@@ -161,7 +196,8 @@ void solve_liner(Equation* quadratic)
 
     if (double_is_same(quadratic->coeff.b, 0) && !double_is_same(quadratic->coeff.c, 0))
         quadratic->roots.ans_number_of_x = zero_roots;  // c = 0
-    else {
+
+    if(!double_is_same(quadratic->coeff.b, 0) && !double_is_same(quadratic->coeff.c, 0)){
         quadratic->roots.x1 = -quadratic->coeff.c / quadratic->coeff.b;
 
         remove_minus_zero(&quadratic->roots.x1); // bx + c = 0
@@ -180,30 +216,49 @@ bool double_is_same(double num1, double num2)
 
 void get_square_coeff(Equation* quadratic)
 {
-    assert(&quadratic->coeff.a != NULL);
-    assert(&quadratic->coeff.b != NULL);
-    assert(&quadratic->coeff.c != NULL);
+    assert(quadratic != NULL);
+    assert(isfinite(quadratic->coeff.a));
+    assert(isfinite(quadratic->coeff.b));
+    assert(isfinite(quadratic->coeff.c));
 
-    int status = 0;
-    printf("¬ведите три действительных коэффицента ax^2 + bx + c через пробел:\n");
-    status = scanf("%lf %lf %lf", &quadratic->coeff.a,
-                                  &quadratic->coeff.b,
-                                  &quadratic->coeff.c);
+    int status1 = 0, status2 = 0, status3 = 0;
 
-    while (status != 3)
-    {
-        printf("¬ведите действительные числа, такие как 0, 1.545, -1.2E12:\n");
-        skip_line();
-        status = scanf("%lf %lf %lf", &quadratic->coeff.a,
-                                      &quadratic->coeff.b,
-                                      &quadratic->coeff.c);
-    }
+    do{
+        again:
+        printf("¬ведите три действительных коэффицента ax^2 + bx + c через пробел:\n");
+        printf("¬ведите коэффицент а: ");
+        status1 = scanf("%lf", &quadratic->coeff.a);
+        int da_ne_bombit_y_menya = chek_EOF(status1);
+        if(da_ne_bombit_y_menya == -1) {
+            break;
+        }
+        else if (da_ne_bombit_y_menya == 1) {
+            goto again;
+        }
+        printf("¬ведите коэффицент b: ");
+        status2 = scanf("%lf", &quadratic->coeff.b);
+        da_ne_bombit_y_menya = chek_EOF(status2);
+        if(da_ne_bombit_y_menya == -1)
+            break;
+        else if (da_ne_bombit_y_menya == 1) goto again;
+
+        printf("¬ведите коэффицент c: ");
+        status3 = scanf("%lf", &quadratic->coeff.c);
+        da_ne_bombit_y_menya = chek_EOF(status3);
+        if(da_ne_bombit_y_menya == -1)
+            break;
+        else if (da_ne_bombit_y_menya == 1) goto again;
+
+
+
+    }while(!(status1 == 1 && status2 == 1 && status3 == 1));
 
 }
 
 
 void print_roots(const Equation* quadratic)
 {
+    assert(quadratic != NULL);
     assert(isfinite(quadratic->roots.ans_number_of_x));
     assert(isfinite(quadratic->roots.x1));
     assert(isfinite(quadratic->roots.x2));
@@ -238,7 +293,71 @@ void remove_minus_zero(double* num){
 
 void skip_line(void)
 {
-    char ch = 0;
+    char ch = '\0';
     while ((ch = getchar()) != '\n')
         continue;
 }
+
+int chek_EOF(int status)
+{
+    assert(isfinite(status));
+    if (status == -1){
+        status_exit = 1;
+        return -1;
+    }
+    char ch = '\0';
+
+    if(status == 1 && (ch = getchar()) == '\n'){
+        return 0;
+    }
+    if (status == 0){
+        skip_line();
+        return 1;
+    }
+    skip_line();
+    return 1;
+}
+
+
+
+
+
+
+
+
+//********************UnitTests**********************
+void TestSolveSquare()
+{                               //a  b  c  n_r x1 x2
+    Ans_SolveSquare answer[5] = {{1, 4, 4, one_roots, -2, 0},
+                                 {1, -5, 6, two_roots, 2, 3},
+                                 {1, 0, 0, one_roots, 0, 0},
+                                 {0, 0, 0, inf_roots, 0, 0},
+                                 {0, 1, 1, one_roots, -1, 0}};
+    for (int i = 0; i < 4; ++i){
+        Equation quadratic_test;
+        quadratic_test.coeff.a = answer[i].a;
+        quadratic_test.coeff.b = answer[i].b;
+        quadratic_test.coeff.c = answer[i].c;
+        solve_square(&quadratic_test);
+
+        if(!(quadratic_test.roots.ans_number_of_x == answer[i].n_roots &&
+          double_is_same(min(quadratic_test.roots.x1, quadratic_test.roots.x2),
+                         min(answer[i].x1, answer[i].x2)) &&
+
+          double_is_same(max(quadratic_test.roots.x1, quadratic_test.roots.x2),
+                         max(answer[i].x1, answer[i].x2))))
+
+         printf("Error a = %lg, b = %lg, c = %lg \nx1 = %lg, x2 = %lg\n Correct: x1_c = %lg, x2_c = %lg\n",
+          answer[i].a, answer[i].b, answer[i].c,
+          min(quadratic_test.roots.x1, quadratic_test.roots.x2),
+          max(quadratic_test.roots.x1, quadratic_test.roots.x2),
+          min(answer[i].x1, answer[i].x2),
+          max(answer[i].x1, answer[i].x2));
+
+    }
+
+}
+
+
+
+
