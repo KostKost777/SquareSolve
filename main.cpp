@@ -10,6 +10,7 @@
 //********************UnitTests**********************
 void TestSolveSquare();
 void TestSolveLiner();
+void TestDoubleIsSame();
 
 
 
@@ -141,6 +142,7 @@ int main(void)
 {
     TestSolveSquare();
     TestSolveLiner();
+    TestDoubleIsSame();
     struct Equation quadratic;
 
     get_square_coeff(&quadratic);
@@ -402,6 +404,26 @@ void TestSolveLiner()
                 answer[i].x1);
 
     }
+}
+
+void TestDoubleIsSame(){        //      num1            num2
+    double AnsDoubleIsSame[5][3] = {{  1.033343,      1.030303,       0},
+                                    {  0.00000000001, 0.0000000001,   1},
+                                    {  2,             2,               1},
+                                    {  3.4,           3.5,             0},
+                                    {  1.66666666,    1.66666667,      1}};
+
+    for(int i = 0; i < 4; ++i){
+        if(!(double_is_same(AnsDoubleIsSame[i][0], AnsDoubleIsSame[i][1]) == AnsDoubleIsSame[i][2]))
+            printf("Error num1 = %lg, num2 = %lg, rez = %d/nCorrect: rez_c = %d",
+                            AnsDoubleIsSame[i][0], AnsDoubleIsSame[i][1],
+                            double_is_same(AnsDoubleIsSame[i][0], AnsDoubleIsSame[i][1]),
+                            AnsDoubleIsSame[i][2]);
+    }
+
+
+
+
 }
 
 
