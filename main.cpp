@@ -1,15 +1,13 @@
+#include <TXLib.h>
 #include <stdio.h>
 #include <math.h>
-#include <TXLib.h>
 #include <assert.h>
 
-//
-//
-//
 
-/// @file ....
+/// @file
 
 const double EPS = 1E-10;
+
 enum Number_of_roots
 {
     inf_roots = -1,
@@ -17,15 +15,30 @@ enum Number_of_roots
     one_roots,
     two_roots
 };
+
+struct Roots{
+    double x1;
+    double x2;
+    Number_of_roots ans_number_of_x;
+};
+
+struct Coeffs {
+    double a;
+    double b;
+    double c;
+};
+
+struct Equation {
+    Roots roots;
+    Coeffs coeff;
+};
+
 /**
+
     @brief Function to skip characters
 **/
-void skip_chars(void)
-{
-    char ch = 0;
-    while ((ch = getchar()) != '\n')
-        continue;
-}
+void skip_line(void);
+
 
 /**
  *
@@ -37,7 +50,7 @@ void skip_chars(void)
 * @param x2 second root
  *
 **/
-Number_of_roots solve_square(double a, double b, double c, double* x1, double* x2);
+void solve_square(Equation* quadratic);
 
 /**
  *
@@ -55,7 +68,7 @@ bool double_is_same(double num1, double num2);
 * @param c constant term
 **/
 
-Number_of_roots solve_liner(double b, double c, double* x1);
+void solve_liner(Equation *quadratic);
 
 /**
  *
@@ -66,7 +79,7 @@ Number_of_roots solve_liner(double b, double c, double* x1);
 **/
 
 
-void get_square_coeff(double* a, double* b, double* c);
+void get_square_coeff(Equation* quadratic);
 
 /**
  *
@@ -78,7 +91,7 @@ void get_square_coeff(double* a, double* b, double* c);
 **/
 
 
-void print_roots(int ans_number_of_x, double x1, double x2);
+void print_roots(const Equation* quadratic);
 
 /**
  *
@@ -88,71 +101,73 @@ void print_roots(int ans_number_of_x, double x1, double x2);
 
 void remove_minus_zero(double* num);
 
-
+//*********************************MAIN**************************************
 int main(void)
 {
-    double a = 0, b = 0, c = 0, x1 = 0, x2 = 0;
+    struct Equation quadratic;
 
-    get_square_coeff(&a, &b, &c);
+    get_square_coeff(&quadratic);
 
-    Number_of_roots ans_number_of_x = solve_square(a, b, c, &x1, &x2);
+    solve_square(&quadratic);
 
-    print_roots(ans_number_of_x, x1, x2);
-
+    print_roots(&quadratic);
 
 }
+//***********************************************************************
 
-Number_of_roots solve_square(double a, double b, double c,
-                             double* x1, double* x2)
+void solve_square(Equation* quadratic)
 {
-    assert(x1 != NULL);
-    assert(x2 != NULL);
-    assert(isfinite(a));
-    assert(isfinite(b));
-    assert(isfinite(c));
+    assert(isfinite(quadratic->coeff.a));
+    assert(isfinite(quadratic->coeff.b));
+    assert(isfinite(quadratic->coeff.c));
+    assert(&quadratic->roots.x1 != NULL);
+    assert(&quadratic->roots.x2 != NULL);
 
-    if (double_is_same(a, 0))
-        return solve_liner(b, c, x1);
 
-    double dis = b * b - 4 * a * c;
+    if (double_is_same(quadratic->coeff.a, 0))
+        solve_liner(quadratic);
+
+    double dis = quadratic->coeff.b * quadratic->coeff.b -
+                        4 * quadratic->coeff.a * quadratic->coeff.c;
 
     if (double_is_same(dis, 0)) {
-        *x1 =  -b / 2 / a;
-        remove_minus_zero(x1);
-        return one_roots;
+        quadratic->roots.x1 =  -quadratic->coeff.b / 2 / quadratic->coeff.a;
+        remove_minus_zero(&quadratic->roots.x1);
+        quadratic->roots.ans_number_of_x = one_roots;
     }
 
     if (dis < 0)
-        return zero_roots;
+        quadratic->roots.ans_number_of_x = zero_roots;
 
     if (dis > 0) {
         double sqrt_dis = sqrt(dis);
-        *x1 = (- b + sqrt_dis) / (2 * a);
-        *x2 = (- b - sqrt_dis) / (2 * a);
-        remove_minus_zero(x1);
-        remove_minus_zero(x2);
-        return two_roots;
+        quadratic->roots.x1 = (-quadratic->coeff.b + sqrt_dis) / (2 * quadratic->coeff.a);
+        quadratic->roots.x2 = (-quadratic->coeff.b - sqrt_dis) / (2 * quadratic->coeff.a);
+        remove_minus_zero(&quadratic->roots.x1);
+        remove_minus_zero(&quadratic->roots.x2);
+        quadratic->roots.ans_number_of_x = two_roots;
     }
 }
 
-Number_of_roots solve_liner(double b, double c,
-                            double* x1)
+void solve_liner(Equation* quadratic)
 {
-    assert(x1 != NULL);
+    assert(&quadratic->roots.x1 != NULL);
 
-    assert(isfinite(b) && isfinite(c));
+    assert(isfinite(quadratic->coeff.b));
+    assert(isfinite(quadratic->coeff.c));
 
-    if(double_is_same(b, 0) && double_is_same(c, 0))
-        return inf_roots; // 0 = 0
+    if (double_is_same(quadratic->coeff.b, 0) && double_is_same(quadratic->coeff.c, 0))
+        quadratic->roots.ans_number_of_x = inf_roots; // 0 = 0
 
-    if(double_is_same(b, 0) && !double_is_same(c, 0))
-        return zero_roots;  // c = 0
+    if (double_is_same(quadratic->coeff.b, 0) && !double_is_same(quadratic->coeff.c, 0))
+        quadratic->roots.ans_number_of_x = zero_roots;  // c = 0
+    else {
+        quadratic->roots.x1 = -quadratic->coeff.c / quadratic->coeff.b;
 
-    *x1 = -c / b;
+        remove_minus_zero(&quadratic->roots.x1); // bx + c = 0
 
-    remove_minus_zero(x1); // bx + c = 0
-
-    return one_roots;
+        quadratic->roots.ans_number_of_x = one_roots;
+    }
 }
 
 bool double_is_same(double num1, double num2)
@@ -163,33 +178,37 @@ bool double_is_same(double num1, double num2)
     return fabs(num1 - num2) < EPS;
 }
 
-void get_square_coeff(double* a, double* b, double* c)
+void get_square_coeff(Equation* quadratic)
 {
-    assert(a != NULL);
-    assert(b != NULL);
-    assert(c != NULL);
+    assert(&quadratic->coeff.a != NULL);
+    assert(&quadratic->coeff.b != NULL);
+    assert(&quadratic->coeff.c != NULL);
 
     int status = 0;
     printf("Введите три действительных коэффицента ax^2 + bx + c через пробел:\n");
-    status = scanf("%lf %lf %lf", a, b, c);
+    status = scanf("%lf %lf %lf", &quadratic->coeff.a,
+                                  &quadratic->coeff.b,
+                                  &quadratic->coeff.c);
+
     while (status != 3)
     {
-
         printf("Введите действительные числа, такие как 0, 1.545, -1.2E12:\n");
-        status = scanf("%lf %lf %lf", a, b, c);
+        skip_line();
+        status = scanf("%lf %lf %lf", &quadratic->coeff.a,
+                                      &quadratic->coeff.b,
+                                      &quadratic->coeff.c);
     }
 
 }
 
 
-void print_roots(int ans_number_of_x,
-                 double x1, double x2)
+void print_roots(const Equation* quadratic)
 {
-    assert(isfinite(ans_number_of_x));
-    assert(isfinite(x1));
-    assert(isfinite(x2));
+    assert(isfinite(quadratic->roots.ans_number_of_x));
+    assert(isfinite(quadratic->roots.x1));
+    assert(isfinite(quadratic->roots.x2));
 
-    switch(ans_number_of_x){
+    switch(quadratic->roots.ans_number_of_x){
         case inf_roots:
             printf("Количество корней бесконечно\n");
             break;
@@ -199,11 +218,13 @@ void print_roots(int ans_number_of_x,
             break;
 
         case one_roots:
-            printf("У этого уравнения один действительный корень: %g\n", x1);
+            printf("У этого уравнения один действительный корень: %lg\n", quadratic->roots.x1);
             break;
 
         case two_roots:
-            printf("У этого уравнения два действительных корня: \n1) %g\n2) %g", x1, x2);
+            printf("У этого уравнения два действительных корня: \n1) %lg\n2) %lg",
+                                                                quadratic->roots.x1,
+                                                                quadratic->roots.x2);
             break;
      }
 }
@@ -215,9 +236,9 @@ void remove_minus_zero(double* num){
         *num = 0;
 }
 
-
-
-
-
-
-
+void skip_line(void)
+{
+    char ch = 0;
+    while ((ch = getchar()) != '\n')
+        continue;
+}
