@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
+#include <stdlib.h>
 
 
 /// @file
@@ -16,7 +17,7 @@ void TestDoubleIsSame();
 
 const double EPS = 1E-10;
 
-int status_exit = 0;
+
 
 enum Number_of_roots
 {
@@ -70,7 +71,7 @@ struct Equation {
     @brief End of file check function
 **/
 
-int chek_EOF(int status);
+bool chek_correct_input(double* input);
 
 /**
 
@@ -150,10 +151,6 @@ int main(void)
 
     get_square_coeff(&quadratic);
 
-    if (status_exit == 1) {
-        printf("GG WP");
-        return 0;
-    }
 
     solve_square(&quadratic);
 
@@ -181,8 +178,8 @@ void solve_square(Equation* quadratic)
 
         if (double_is_same(dis, 0)) {
 
-            quadratic->roots.x1 = max(-quadratic->coeff.b / 2 / quadratic->coeff.a, 0.0);
-            quadratic->roots.x2 = min(-quadratic->coeff.b / 2 / quadratic->coeff.a, 0.0);
+            quadratic->roots.x1 = -quadratic->coeff.b / 2 / quadratic->coeff.a;
+            quadratic->roots.x2 = -quadratic->coeff.b / 2 / quadratic->coeff.a;
             //printf("\n--%lg\n", quadratic->roots.x2);
             remove_minus_zero(&quadratic->roots.x1);
             remove_minus_zero(&quadratic->roots.x2);
@@ -242,7 +239,7 @@ bool double_is_same(double num1, double num2)
 
     return fabs(num1 - num2) < EPS;
 }
-
+ // функциональные макросы define
 void get_square_coeff(Equation* quadratic)
 {
     assert(quadratic != NULL);
@@ -250,37 +247,29 @@ void get_square_coeff(Equation* quadratic)
     assert(isfinite(quadratic->coeff.b));
     assert(isfinite(quadratic->coeff.c));
 
-    int status1 = 0, status2 = 0, status3 = 0;
 
-    do{
-        again:
-        printf("¬ведите три действительных коэффицента ax^2 + bx + c через пробел:\n");
-        printf("¬ведите коэффицент а: ");
-        status1 = scanf("%lf", &quadratic->coeff.a);
-        int da_ne_bombit_y_menya = chek_EOF(status1);
-        if(da_ne_bombit_y_menya == -1) {
-            break;
+    bool da_ne_bombit_y_menya;
+    char arr_char_coeff[3] = {'a', 'b', 'c'};
+    double* arr_coeff[3] = {&quadratic->coeff.a, &quadratic->coeff.b, &quadratic->coeff.c};
+
+    int counter = 0;
+    do {
+        if(counter == 0)
+            printf("¬ведите три действительных коэффицента ax^2 + bx + c через пробел:\n");
+
+        printf("¬ведите коэффицент %c: ", arr_char_coeff[counter]);
+
+        da_ne_bombit_y_menya = chek_correct_input(arr_coeff[counter]);
+
+
+        if (da_ne_bombit_y_menya){
+            counter = 0;
+            continue;
         }
-        else if (da_ne_bombit_y_menya == 1) {
-            goto again;
-        }
-        printf("¬ведите коэффицент b: ");
-        status2 = scanf("%lf", &quadratic->coeff.b);
-        da_ne_bombit_y_menya = chek_EOF(status2);
-        if(da_ne_bombit_y_menya == -1)
-            break;
-        else if (da_ne_bombit_y_menya == 1) goto again;
-
-        printf("¬ведите коэффицент c: ");
-        status3 = scanf("%lf", &quadratic->coeff.c);
-        da_ne_bombit_y_menya = chek_EOF(status3);
-        if(da_ne_bombit_y_menya == -1)
-            break;
-        else if (da_ne_bombit_y_menya == 1) goto again;
+        counter++;
 
 
-
-    }while(!(status1 == 1 && status2 == 1 && status3 == 1));
+    }while(counter !=  3);
 
 }
 
@@ -319,7 +308,7 @@ void print_roots(const Equation* quadratic)
 void remove_minus_zero(double* num){
     assert(num != NULL);
 
-    if(*num == -0.0)
+    if(double_is_same(*num, -0))
         *num = 0;
 }
 
@@ -330,24 +319,27 @@ void skip_line(void)
         continue;
 }
 
-int chek_EOF(int status)
+bool chek_correct_input(double* input)
 {
-    assert(isfinite(status));
+    assert(input != NULL);
+
+    int status = scanf("%lf", input);
+
+
     if (status == -1){
-        status_exit = 1;
-        return -1;
+        printf("GG WP");
+        exit(0);
+        return true;
     }
+
     char ch = '\0';
 
-    if(status == 1 && (ch = getchar()) == '\n'){
-        return 0;
+    if( status && ((ch = getchar()) == '\n')){
+        return false;
     }
-    if (status == 0){
-        skip_line();
-        return 1;
-    }
+
     skip_line();
-    return 1;
+    return true;
 }
 
 
@@ -361,13 +353,15 @@ int chek_EOF(int status)
 //***************************************************
 
 //********************TestSolveSquare****************
+
+// a: 1 b: 4 c: 4 ONE_ROOT x1 = -2 x2 = -2
 void TestSolveSquare()
 {                         //      a   b   c     n_r     x1 > x2
-    Ans_SolveSquare answer[5] = {{1,  4,  4, one_roots, 0,  -2},
+    Ans_SolveSquare answer[] =  {{1,  4,  4, one_roots, -2,  -2},
                                  {1, -5,  6, two_roots,  3,  2},
                                  {1,  0,  0, one_roots,  0,  0},
                                  {0,  0,  0, inf_roots,  0,  0},
-                                 {0,  1,  1, one_roots, 0,  -1}};
+                                 {0,  1,  1, one_roots, -1,  -1}};
     for (int i = 0; i < 4; ++i){
         Equation quadratic_test;
         quadratic_test.coeff.a = answer[i].a;
