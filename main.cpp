@@ -193,8 +193,11 @@ void solve_square(Equation* quadratic)
         }
         else if (dis > 0) {
             double sqrt_dis = sqrt(dis);
-            quadratic->roots.x1 = (-quadratic->coeff.b + sqrt_dis) / (2 * quadratic->coeff.a);
-            quadratic->roots.x2 = (-quadratic->coeff.b - sqrt_dis) / (2 * quadratic->coeff.a);
+            quadratic->roots.x1 = max((-quadratic->coeff.b + sqrt_dis) / (2 * quadratic->coeff.a),
+                                      (-quadratic->coeff.b - sqrt_dis) / (2 * quadratic->coeff.a));
+
+            quadratic->roots.x2 = min((-quadratic->coeff.b + sqrt_dis) / (2 * quadratic->coeff.a),
+                                      (-quadratic->coeff.b - sqrt_dis) / (2 * quadratic->coeff.a));
             remove_minus_zero(&quadratic->roots.x1);
             remove_minus_zero(&quadratic->roots.x2);
             quadratic->roots.ans_number_of_x = two_roots;
@@ -219,10 +222,12 @@ void solve_liner(Equation* quadratic)
         quadratic->roots.x2 = 0;
     }
     else if(!double_is_same(quadratic->coeff.b, 0) && !double_is_same(quadratic->coeff.c, 0)){
-        quadratic->roots.x1 = max(-quadratic->coeff.c / quadratic->coeff.b, 0.0);
-        quadratic->roots.x2 = min(-quadratic->coeff.c / quadratic->coeff.b, 0.0); // bx + c = 0
+        quadratic->roots.x1 = -quadratic->coeff.c / quadratic->coeff.b;
+        quadratic->roots.x2 = -quadratic->coeff.c / quadratic->coeff.b; // bx + c = 0
 
         quadratic->roots.ans_number_of_x = one_roots;
+        remove_minus_zero(&quadratic->roots.x1);
+        remove_minus_zero(&quadratic->roots.x2);
     }
     else {
         quadratic->roots.x1 = 0;
@@ -239,7 +244,7 @@ bool double_is_same(double num1, double num2)
 
     return fabs(num1 - num2) < EPS;
 }
- // функциональные макросы define
+
 void get_square_coeff(Equation* quadratic)
 {
     assert(quadratic != NULL);
@@ -326,15 +331,14 @@ bool chek_correct_input(double* input)
     int status = scanf("%lf", input);
 
 
-    if (status == -1){
+    if (status == -1) {
         printf("GG WP");
         exit(0);
-        return true;
     }
 
     char ch = '\0';
 
-    if( status && ((ch = getchar()) == '\n')){
+    if ( status && ((ch = getchar()) == '\n')) {
         return false;
     }
 
@@ -354,95 +358,113 @@ bool chek_correct_input(double* input)
 
 //********************TestSolveSquare****************
 
-// a: 1 b: 4 c: 4 ONE_ROOT x1 = -2 x2 = -2
 void TestSolveSquare()
-{                         //      a   b   c     n_r     x1 > x2
-    Ans_SolveSquare answer[] =  {{1,  4,  4, one_roots, -2,  -2},
-                                 {1, -5,  6, two_roots,  3,  2},
-                                 {1,  0,  0, one_roots,  0,  0},
-                                 {0,  0,  0, inf_roots,  0,  0},
-                                 {0,  1,  1, one_roots, -1,  -1}};
-    for (int i = 0; i < 4; ++i){
+{
+
+    FILE *file_test;
+    file_test = fopen("TestSolveSquare.txt", "r");
+    assert(file_test != NULL);
+    int status = 0;
+
+    do {
         Equation quadratic_test;
-        quadratic_test.coeff.a = answer[i].a;
-        quadratic_test.coeff.b = answer[i].b;
-        quadratic_test.coeff.c = answer[i].c;
+        Ans_SolveSquare answer;
+
+        status = fscanf(file_test, "a: %lf b: %lf c: %lf n_r: %d x1 = %lf x2 = %lf\n",
+        &answer.a, &answer.b, &answer.c,
+        &answer.n_roots,
+        &answer.x1,
+        &answer.x2);
+
+        quadratic_test.coeff.a = answer.a;
+        quadratic_test.coeff.b = answer.b;
+        quadratic_test.coeff.c = answer.c;
         solve_square(&quadratic_test);
 
-        if(!((quadratic_test.roots.ans_number_of_x == answer[i].n_roots) &&
-          double_is_same(quadratic_test.roots.x2, answer[i].x2) &&
+        if (!((quadratic_test.roots.ans_number_of_x == answer.n_roots) &&
+          double_is_same(quadratic_test.roots.x2, answer.x2) &&
 
-          double_is_same(quadratic_test.roots.x1, answer[i].x1))){
+          double_is_same(quadratic_test.roots.x1, answer.x1))) {
 
          printf("Error a = %lg, b = %lg, c = %lg \n"
                 "\nx1 = %lg, x2 = %lg\n"
                 "\nn_r = %d\n"
                 " Correct: x1_c = %lg, x2_c = %lg, c_n_r = %d\n",
-          answer[i].a, answer[i].b, answer[i].c,
-          quadratic_test.roots.x1,
-          quadratic_test.roots.x2,
-          quadratic_test.roots.ans_number_of_x,
-          answer[i].x1,
-          answer[i].x2,
-          answer[i].n_roots);
+                  answer.a, answer.b, answer.c,
+                  quadratic_test.roots.x1,
+                  quadratic_test.roots.x2,
+                  quadratic_test.roots.ans_number_of_x,
+                  answer.x1,
+                  answer.x2,
+                  answer.n_roots);
           }
 
-    }
+    } while(status != -1);
+    fclose(file_test);
 
 }
 
 //**************************TestSolveLiner***************************
 
 void TestSolveLiner()
-{                          //      a   b   c     n_r     x1  x2
-    Ans_SolveSquare answer[5] = {{0, 1,  0, one_roots,  0,  0},
-                                 {0, 2,  4, one_roots,  0, -2},
-                                 {0, 2,  3, one_roots,  0, -1.5},
-                                 {0, 0,  0, inf_roots,  0,  0},
-                                 {0, 4, -12,one_roots,  3,  0}};
-    for (int i = 0; i < 4; ++i){
+{
+    FILE *file_test;
+    file_test = fopen("TestSolveSquare.txt", "r");
+    assert(file_test != NULL);
+    int status = 0;
+
+
+    do {
         Equation quadratic_test;
-        quadratic_test.coeff.b = answer[i].b;
-        quadratic_test.coeff.c = answer[i].c;
+        Ans_SolveSquare answer;
+
+        status = fscanf(file_test, "a: %lf b: %lf c: %lf n_r: %d x1 = %lf x2 = %lf\n",
+                                    &answer.a, &answer.b, &answer.c,
+                                    &answer.n_roots,
+                                    &answer.x1,
+                                    &answer.x2);
+        if (!double_is_same(answer.a, 0)) continue;
+
+        quadratic_test.coeff.b = answer.b;
+        quadratic_test.coeff.c = answer.c;
         solve_liner(&quadratic_test);
 
-        if(!(quadratic_test.roots.ans_number_of_x == answer[i].n_roots &&
-          double_is_same(quadratic_test.roots.x1, answer[i].x1) &&
-          double_is_same(quadratic_test.roots.x2, answer[i].x2))){
+        if (!(quadratic_test.roots.ans_number_of_x == answer.n_roots &&
+                double_is_same(quadratic_test.roots.x1, answer.x1) &&
+                double_is_same(quadratic_test.roots.x2, answer.x2))) {
 
          printf("Error b = %lg, c = %lg \nx1 = %lg \n n_r = %d \n Correct: x1_c = %lg\n",
-                answer[i].b, answer[i].c,
+                answer.b, answer.c,
                 quadratic_test.roots.x1,
                 quadratic_test.roots.ans_number_of_x,
-                answer[i].x1);
+                answer.x1);
         }
 
-    }
+    } while (status != -1);
+    fclose(file_test);
 }
 
-void TestDoubleIsSame() {        //      num1            num2        bool
-    Ans_DoubleIsSame answer[5] = {{  1.033343,      1.030303,         false},
-                                    {  0.00000000001, 0.0000000001,   true},
-                                    {  2,             2,              true},
-                                    {  3.4,           3.5,            false},
-                                    {  1.66666666,    1.66666667,     true}};
+void TestDoubleIsSame() {
 
-    for(int i = 0; i < 4; ++i) {
-        if(!(double_is_same(answer[i].num1, answer[i].num2) == answer[i].verdict)){
-            printf("Error num1 = %lg, num2 = %lg, rez = %d/nCorrect: rez_c = %d",
-                            answer[i].num1, answer[i].num2,
-                            double_is_same(answer[i].num1, answer[i].num2),
-                            answer[i].verdict);
+    FILE *file_test;
+    file_test = fopen("TestDoubleIsSame.txt", "r");
+    assert(file_test != NULL);
+    int status = 0;
+
+    do {
+        Ans_DoubleIsSame answer;
+
+        status = fscanf(file_test, "n1 = %lf n2 = %lf ver = %d\n",
+                                    &answer.num1, &answer.num2,
+                                    &answer.verdict);
+
+        if(!(double_is_same(answer.num1, answer.num2) == answer.verdict)){
+            printf("Error num1 = %lg, num2 = %lg, rez = %d\nCorrect: rez_c = %d\n",
+                            answer.num1, answer.num2,
+                            double_is_same(answer.num1, answer.num2),
+                            answer.verdict);
         }
-    }
-
-
-
-
+    } while(status != -1);
+    fclose(file_test);
 }
-
-
-
-
-
 
