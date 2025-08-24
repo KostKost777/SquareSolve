@@ -27,6 +27,14 @@ enum Number_of_roots
 };
 
 //**********************STRUCTS*********************************
+
+struct Ans_DoubleIsSame{
+    double num1;
+    double num2;
+    bool verdict;
+};
+
+
 struct Ans_SolveSquare
 {
     double a;
@@ -36,16 +44,11 @@ struct Ans_SolveSquare
     double x1;
     double x2;
 };
-struct Ans_SolveLiner{
-    double b;
-    double c;
-    Number_of_roots n_roots;
-    double x1;
 
-};
+
 struct Roots{
-    double x1 = 0;
-    double x2 = 0;
+    double x1;
+    double x2;
     Number_of_roots ans_number_of_x;
 };
 
@@ -177,15 +180,21 @@ void solve_square(Equation* quadratic)
                             4 * quadratic->coeff.a * quadratic->coeff.c;
 
         if (double_is_same(dis, 0)) {
-            quadratic->roots.x1 =  -quadratic->coeff.b / 2 / quadratic->coeff.a;
+
+            quadratic->roots.x1 = max(-quadratic->coeff.b / 2 / quadratic->coeff.a, 0.0);
+            quadratic->roots.x2 = min(-quadratic->coeff.b / 2 / quadratic->coeff.a, 0.0);
+            //printf("\n--%lg\n", quadratic->roots.x2);
             remove_minus_zero(&quadratic->roots.x1);
+            remove_minus_zero(&quadratic->roots.x2);
             quadratic->roots.ans_number_of_x = one_roots;
         }
 
-        if (dis < 0)
+        else if (dis < 0){
             quadratic->roots.ans_number_of_x = zero_roots;
-
-        if (dis > 0) {
+            quadratic->roots.x1 = 0;
+            quadratic->roots.x2 = 0;
+        }
+        else if (dis > 0) {
             double sqrt_dis = sqrt(dis);
             quadratic->roots.x1 = (-quadratic->coeff.b + sqrt_dis) / (2 * quadratic->coeff.a);
             quadratic->roots.x2 = (-quadratic->coeff.b - sqrt_dis) / (2 * quadratic->coeff.a);
@@ -202,21 +211,25 @@ void solve_liner(Equation* quadratic)
     assert(isfinite(quadratic->coeff.b));
     assert(isfinite(quadratic->coeff.c));
 
-    if (double_is_same(quadratic->coeff.b, 0) && double_is_same(quadratic->coeff.c, 0))
+    if (double_is_same(quadratic->coeff.b, 0) && double_is_same(quadratic->coeff.c, 0)){
         quadratic->roots.ans_number_of_x = inf_roots; // 0 = 0
-
-    else if (double_is_same(quadratic->coeff.b, 0) && !double_is_same(quadratic->coeff.c, 0))
+        quadratic->roots.x1 = 0;
+        quadratic->roots.x2 = 0;
+    }
+    else if (double_is_same(quadratic->coeff.b, 0) && !double_is_same(quadratic->coeff.c, 0)){
         quadratic->roots.ans_number_of_x = zero_roots;  // c = 0
-
+        quadratic->roots.x1 = 0;
+        quadratic->roots.x2 = 0;
+    }
     else if(!double_is_same(quadratic->coeff.b, 0) && !double_is_same(quadratic->coeff.c, 0)){
-        quadratic->roots.x1 = -quadratic->coeff.c / quadratic->coeff.b;
-
-        remove_minus_zero(&quadratic->roots.x1); // bx + c = 0
+        quadratic->roots.x1 = max(-quadratic->coeff.c / quadratic->coeff.b, 0.0);
+        quadratic->roots.x2 = min(-quadratic->coeff.c / quadratic->coeff.b, 0.0); // bx + c = 0
 
         quadratic->roots.ans_number_of_x = one_roots;
     }
     else {
-        quadratic->roots.x1 = 0;                // bx = 0
+        quadratic->roots.x1 = 0;
+        quadratic->roots.x2 = 0;                // bx = 0
         quadratic->roots.ans_number_of_x = one_roots;
     }
 
@@ -293,7 +306,8 @@ void print_roots(const Equation* quadratic)
             break;
 
         case two_roots:
-            printf("” этого уравнени€ два действительных корн€: \n1) %lg\n2) %lg",
+            printf("” этого уравнени€ два действительных корн€: \n"
+                   "1) %lg\n2) %lg",
                                                                 quadratic->roots.x1,
                                                                 quadratic->roots.x2);
             break;
@@ -305,7 +319,7 @@ void print_roots(const Equation* quadratic)
 void remove_minus_zero(double* num){
     assert(num != NULL);
 
-    if(*num == -0)
+    if(*num == -0.0)
         *num = 0;
 }
 
@@ -348,12 +362,12 @@ int chek_EOF(int status)
 
 //********************TestSolveSquare****************
 void TestSolveSquare()
-{                         //      a   b   c     n_r     x1   x2
-    Ans_SolveSquare answer[5] = {{1,  4,  4, one_roots, -2,  0},
-                                 {1, -5,  6, two_roots,  2,  3},
+{                         //      a   b   c     n_r     x1 > x2
+    Ans_SolveSquare answer[5] = {{1,  4,  4, one_roots, 0,  -2},
+                                 {1, -5,  6, two_roots,  3,  2},
                                  {1,  0,  0, one_roots,  0,  0},
                                  {0,  0,  0, inf_roots,  0,  0},
-                                 {0,  1,  1, one_roots, -1,  0}};
+                                 {0,  1,  1, one_roots, 0,  -1}};
     for (int i = 0; i < 4; ++i){
         Equation quadratic_test;
         quadratic_test.coeff.a = answer[i].a;
@@ -361,19 +375,23 @@ void TestSolveSquare()
         quadratic_test.coeff.c = answer[i].c;
         solve_square(&quadratic_test);
 
-        if(!(quadratic_test.roots.ans_number_of_x == answer[i].n_roots &&
-          double_is_same(min(quadratic_test.roots.x1, quadratic_test.roots.x2),
-                         min(answer[i].x1, answer[i].x2)) &&
+        if(!((quadratic_test.roots.ans_number_of_x == answer[i].n_roots) &&
+          double_is_same(quadratic_test.roots.x2, answer[i].x2) &&
 
-          double_is_same(max(quadratic_test.roots.x1, quadratic_test.roots.x2),
-                         max(answer[i].x1, answer[i].x2))))
+          double_is_same(quadratic_test.roots.x1, answer[i].x1))){
 
-         printf("Error a = %lg, b = %lg, c = %lg \nx1 = %lg, x2 = %lg\n Correct: x1_c = %lg, x2_c = %lg\n",
+         printf("Error a = %lg, b = %lg, c = %lg \n"
+                "\nx1 = %lg, x2 = %lg\n"
+                "\nn_r = %d\n"
+                " Correct: x1_c = %lg, x2_c = %lg, c_n_r = %d\n",
           answer[i].a, answer[i].b, answer[i].c,
-          min(quadratic_test.roots.x1, quadratic_test.roots.x2),
-          max(quadratic_test.roots.x1, quadratic_test.roots.x2),
-          min(answer[i].x1, answer[i].x2),
-          max(answer[i].x1, answer[i].x2));
+          quadratic_test.roots.x1,
+          quadratic_test.roots.x2,
+          quadratic_test.roots.ans_number_of_x,
+          answer[i].x1,
+          answer[i].x2,
+          answer[i].n_roots);
+          }
 
     }
 
@@ -382,12 +400,12 @@ void TestSolveSquare()
 //**************************TestSolveLiner***************************
 
 void TestSolveLiner()
-{                          //     b   c     n_r     x1
-    Ans_SolveLiner answer[5] = { {1,  0, one_roots,  0},
-                                 {2,  4, one_roots, -2},
-                                 {2,  3, one_roots, -1.5},
-                                 {0,  0, inf_roots,  0},
-                                 {4,  -12,one_roots, 3}};
+{                          //      a   b   c     n_r     x1  x2
+    Ans_SolveSquare answer[5] = {{0, 1,  0, one_roots,  0,  0},
+                                 {0, 2,  4, one_roots,  0, -2},
+                                 {0, 2,  3, one_roots,  0, -1.5},
+                                 {0, 0,  0, inf_roots,  0,  0},
+                                 {0, 4, -12,one_roots,  3,  0}};
     for (int i = 0; i < 4; ++i){
         Equation quadratic_test;
         quadratic_test.coeff.b = answer[i].b;
@@ -395,30 +413,33 @@ void TestSolveLiner()
         solve_liner(&quadratic_test);
 
         if(!(quadratic_test.roots.ans_number_of_x == answer[i].n_roots &&
-          double_is_same(quadratic_test.roots.x1, answer[i].x1)))
+          double_is_same(quadratic_test.roots.x1, answer[i].x1) &&
+          double_is_same(quadratic_test.roots.x2, answer[i].x2))){
 
          printf("Error b = %lg, c = %lg \nx1 = %lg \n n_r = %d \n Correct: x1_c = %lg\n",
                 answer[i].b, answer[i].c,
                 quadratic_test.roots.x1,
                 quadratic_test.roots.ans_number_of_x,
                 answer[i].x1);
+        }
 
     }
 }
 
-void TestDoubleIsSame(){        //      num1            num2
-    double AnsDoubleIsSame[5][3] = {{  1.033343,      1.030303,       0},
-                                    {  0.00000000001, 0.0000000001,   1},
-                                    {  2,             2,               1},
-                                    {  3.4,           3.5,             0},
-                                    {  1.66666666,    1.66666667,      1}};
+void TestDoubleIsSame() {        //      num1            num2        bool
+    Ans_DoubleIsSame answer[5] = {{  1.033343,      1.030303,         false},
+                                    {  0.00000000001, 0.0000000001,   true},
+                                    {  2,             2,              true},
+                                    {  3.4,           3.5,            false},
+                                    {  1.66666666,    1.66666667,     true}};
 
-    for(int i = 0; i < 4; ++i){
-        if(!(double_is_same(AnsDoubleIsSame[i][0], AnsDoubleIsSame[i][1]) == AnsDoubleIsSame[i][2]))
+    for(int i = 0; i < 4; ++i) {
+        if(!(double_is_same(answer[i].num1, answer[i].num2) == answer[i].verdict)){
             printf("Error num1 = %lg, num2 = %lg, rez = %d/nCorrect: rez_c = %d",
-                            AnsDoubleIsSame[i][0], AnsDoubleIsSame[i][1],
-                            double_is_same(AnsDoubleIsSame[i][0], AnsDoubleIsSame[i][1]),
-                            AnsDoubleIsSame[i][2]);
+                            answer[i].num1, answer[i].num2,
+                            double_is_same(answer[i].num1, answer[i].num2),
+                            answer[i].verdict);
+        }
     }
 
 
