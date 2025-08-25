@@ -1,0 +1,14 @@
+CC=g++
+CFLAGS=-c -Wall
+LDFLAGS=
+SOURCES=main.cpp Unit_Tests.cpp UI.cpp double_operations.cpp Equation_Solve.cpp line_operations.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=out
+
+all: $(SOURCES) $(EXECUTABLE)
+	
+$(EXECUTABLE): $(OBJECTS) 
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o $@

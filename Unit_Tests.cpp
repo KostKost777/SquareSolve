@@ -9,6 +9,8 @@
 #include "double_operations.h"
 #include "unit_tests.h"
 
+Number_of_roots convert_from_int(int num);
+
 struct Ans_DoubleIsSame{
     double num1;
     double num2;
@@ -26,6 +28,27 @@ struct Ans_SolveSquare
     double x2;
 };
 
+Number_of_roots convert_from_int(int num)
+{
+    switch(num){
+        case -1:
+            return inf_roots;
+            break;
+        case 0:
+            return zero_roots;
+            break;
+        case 1:
+            return one_roots;
+            break;
+        case 2:
+            return two_roots;
+            break;
+        default:
+            return inf_roots;
+            break;
+        }
+}
+
 //********************TestSolveSquare****************
 
 void TestSolveSquare()
@@ -39,13 +62,14 @@ void TestSolveSquare()
     do {
         Equation quadratic_test;
         Ans_SolveSquare answer;
-
+        int answer_n_roots = 0;
         status = fscanf(file_test, "a: %lf b: %lf c: %lf n_r: %d x1 = %lf x2 = %lf\n",
                                     &answer.a, &answer.b, &answer.c,
-                                    &answer.n_roots,
+                                    &answer_n_roots,
                                     &answer.x1,
                                     &answer.x2);
-
+        if(status == -1) break;
+        answer.n_roots = convert_from_int(answer_n_roots);
         quadratic_test.coeff.a = answer.a;
         quadratic_test.coeff.b = answer.b;
         quadratic_test.coeff.c = answer.c;
@@ -72,6 +96,7 @@ void TestSolveSquare()
     } while(status != -1);
     fclose(file_test);
 
+
 }
 
 //**************************TestSolveLiner***************************
@@ -87,12 +112,15 @@ void TestSolveLiner()
     do {
         Equation quadratic_test;
         Ans_SolveSquare answer;
-
+        int answer_n_roots = 0;
         status = fscanf(file_test, "a: %lf b: %lf c: %lf n_r: %d x1 = %lf x2 = %lf\n",
                                     &answer.a, &answer.b, &answer.c,
-                                    &answer.n_roots,
+                                    &answer_n_roots,
                                     &answer.x1,
                                     &answer.x2);
+        if(status == -1) break;
+
+        answer.n_roots = convert_from_int(answer_n_roots);
         if (!double_is_same(answer.a, 0)) continue;
 
         quadratic_test.coeff.b = answer.b;
