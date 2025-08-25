@@ -3,13 +3,48 @@
 #include <math.h>
 #include <assert.h>
 #include <stdlib.h>
-#include "equastion_solve.h"
+
+#include "equation_solve.h"
+#include "line_operations.h"
+#include "double_operations.h"
 #include "UI.h"
-#include "checkers.h"
-#include "unit_tests.h"
 
 
 
+
+/**
+
+    @brief End of file check function
+**/
+
+bool chek_correct_input(double* input);
+
+
+
+
+
+
+bool chek_correct_input(double* input)
+{
+    assert(input != NULL);
+
+    int status = scanf("%lf", input);
+
+
+    if (status == -1) {
+        printf("GG WP");
+        exit(0);
+    }
+
+    int ch = 0;
+
+    if ( status && ((ch = getchar()) == '\n')) {
+        return false;
+    }
+
+    skip_line();
+    return true;
+}
 
 void get_square_coeff(Equation* quadratic)
 {

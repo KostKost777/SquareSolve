@@ -3,20 +3,27 @@
 #include <math.h>
 #include <assert.h>
 #include <stdlib.h>
-#include "equastion_solve.h"
-#include "UI.h"
-#include "checkers.h"
+
+#include "equation_solve.h"
+#include "line_operations.h"
+#include "double_operations.h"
 #include "unit_tests.h"
+#include "UI.h"
+
+
+
+
 
 
 //*********************************MAIN**************************************
+
 int main(void)
 {
     TestSolveSquare();
     TestSolveLiner();
     TestDoubleIsSame();
 
-    struct Equation quadratic;
+    struct Equation quadratic = {};
 
     get_square_coeff(&quadratic);
 

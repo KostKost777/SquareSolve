@@ -3,15 +3,28 @@
 #include <math.h>
 #include <assert.h>
 #include <stdlib.h>
-#include "equastion_solve.h"
-#include "checkers.h"
+
+#include "equation_solve.h"
+#include "line_operations.h"
+#include "double_operations.h"
 #include "unit_tests.h"
 
+struct Ans_DoubleIsSame{
+    double num1;
+    double num2;
+    bool verdict;
+};
 
 
-//***************************************************
-//********************UnitTests**********************
-//***************************************************
+struct Ans_SolveSquare
+{
+    double a;
+    double b;
+    double c;
+    Number_of_roots n_roots;
+    double x1;
+    double x2;
+};
 
 //********************TestSolveSquare****************
 
@@ -28,10 +41,10 @@ void TestSolveSquare()
         Ans_SolveSquare answer;
 
         status = fscanf(file_test, "a: %lf b: %lf c: %lf n_r: %d x1 = %lf x2 = %lf\n",
-        &answer.a, &answer.b, &answer.c,
-        &answer.n_roots,
-        &answer.x1,
-        &answer.x2);
+                                    &answer.a, &answer.b, &answer.c,
+                                    &answer.n_roots,
+                                    &answer.x1,
+                                    &answer.x2);
 
         quadratic_test.coeff.a = answer.a;
         quadratic_test.coeff.b = answer.b;
@@ -113,10 +126,11 @@ void TestDoubleIsSame() {
 
     do {
         Ans_DoubleIsSame answer;
-
+        int verdict_int = 0;
         status = fscanf(file_test, "n1 = %lf n2 = %lf ver = %d\n",
                                     &answer.num1, &answer.num2,
-                                    &answer.verdict);
+                                    &verdict_int);
+        answer.verdict = verdict_int;
 
         if(!(double_is_same(answer.num1, answer.num2) == answer.verdict)){
             printf("Error num1 = %lg, num2 = %lg, rez = %d\nCorrect: rez_c = %d\n",

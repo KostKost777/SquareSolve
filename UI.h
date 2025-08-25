@@ -1,4 +1,5 @@
-
+#ifndef UI
+#define UI
 
 /// @file
 /**
@@ -24,4 +25,4 @@ void get_square_coeff(Equation* quadratic);
 
 void print_roots(const Equation* quadratic);
 
-
+#endif
