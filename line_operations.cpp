@@ -6,7 +6,7 @@
 
 
 #include "line_operations.h"
-
+#include "equation_solve.h"
 
 void skip_line(void)
 {

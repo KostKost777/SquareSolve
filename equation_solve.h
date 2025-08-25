@@ -9,6 +9,16 @@ enum Number_of_roots
     two_roots
 };
 
+struct Ans_SolveSquare
+{
+    double a;
+    double b;
+    double c;
+    Number_of_roots n_roots;
+    double x1;
+    double x2;
+};
+
 struct Roots{
     double x1;
     double x2;

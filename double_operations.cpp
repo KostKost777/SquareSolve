@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "double_operations.h"
+#include "equation_solve.h"
 
 const double EPS = 1E-7;
 

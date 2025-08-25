@@ -18,16 +18,6 @@ struct Ans_DoubleIsSame{
 };
 
 
-struct Ans_SolveSquare
-{
-    double a;
-    double b;
-    double c;
-    Number_of_roots n_roots;
-    double x1;
-    double x2;
-};
-
 Number_of_roots convert_from_int(int num)
 {
     switch(num){
