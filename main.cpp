@@ -11,10 +11,24 @@
 #include "unit_tests.h"
 #include "UI.h"
 
+
+
+struct Flags {
+    const char* short_flag;
+    const char* long_flag;
+    void (*func)(const char* argv[], int i, int argc);
+};
+void initialization_flags(Flags arr_with_flags[]);
+
 int check_flags(int argc, const char* argv[]);
+
 void input_coeff_by_file(const char* argv[], int i, int argc);
-bool char_is_num(int num);
+
 void run_from_cli_default(const char* argv[]);
+
+void print_documentation(const char* argv[], int i, int argc);
+
+void all_tests_runner(const char* argv[], int i, int argc);
 
 ///@file
 
@@ -56,37 +70,25 @@ int main(int argc, const char* argv[]) // argc argv
 
 int check_flags(int argc, const char* argv[]) {
     // for loop: if (strcmp(name, flag_name)) {do_flag();}
+    const int NumberOfFlags = 3;
+    Flags arr_with_flags[3];
+
+    initialization_flags(arr_with_flags);
+
     if (argc > 1) {
         if (argc == 4) {
             run_from_cli_default(argv);
             return 1;
-
         }
         else {
+            // size_t
             for (int i = 1; i < argc; ++i) {
-                if (!(strcmp(argv[i], "-h")) || !(strcmp(argv[i], "--help"))) {
-                    printf("\n\n\n******************************************\n"
-                           "Программа для решения квадратного уравнения.\n"
-                           "Дополнительные флаги запуска:\n"
-                           "-h (--help): информация о программе.\n"
-                           "-t (--tests): запуск с тестами.\n"
-                           "-f (--file) file_name.txt: поиск корней по коэффицентам из файла.\n"
-                           "Также сразу после .exe файла можно ввести три\n"
-                           "последовательных действительных числа и программа выдаст их корни.\n"
-                           "Для обычного запуска введите .exe файл.\n"
-                           "******************************************\n\n\n");
-                    return 1;
-                }
-                else if (!(strcmp(argv[i], "-t")) || !(strcmp(argv[i], "--tests"))) {
-                    test_solve_square();
-                    test_solve_line();
-                    test_double_is_same();
-                    return 0;
-                }
-                else if (!(strcmp(argv[i], "-f")) || !(strcmp(argv[i], "--file"))) {
-                    // argv, argc, i
-                    input_coeff_by_file(argv, i, argc);
-                    return 1;
+                for (int j = 0; j < 3; ++j) {
+                    if ((strcmp(argv[i], arr_with_flags[j].short_flag) == 0)
+                        || (strcmp(argv[i], arr_with_flags[j].long_flag) == 0)){
+                        arr_with_flags[j].func(argv, i, argc);
+                            return 0;
+                    }
                 }
             }
         }
@@ -96,21 +98,21 @@ int check_flags(int argc, const char* argv[]) {
 
 
 void input_coeff_by_file(const char* argv[], int i, int argc) {
-    assert(argv != NULL);
-    assert(isfinite(i));
-    assert(isfinite(argc));
+    assert(argv == NULL);
 
     FILE *input_file = NULL;
     char inp_file_name[260] = "";
-    printf("Вы забыли ввести имя файла\n");
 
     if (i + 1 > argc - 1) { //проверка выхода за границы массива
         do {
-            printf("Введите существующий файл:  ");
+
             scanf("%260s", inp_file_name);
             input_file = fopen(inp_file_name, "r");
-            if (input_file == NULL)
+            if (input_file == NULL){
+                printf("Введите существующий файл:  \n");
                 continue;
+            }
+
             else
                 break;
 
@@ -124,7 +126,7 @@ void input_coeff_by_file(const char* argv[], int i, int argc) {
 
     do {
         Equation quadratic_input;
-        status = fscanf(input_file, "a = %lf b = %lf c = %lf\n",
+        status = fscanf(input_file_name, "a = %lf b = %lf c = %lf\n",
                                     &quadratic_input.coeff.a,
                                     &quadratic_input.coeff.b,
                                     &quadratic_input.coeff.c);
@@ -166,4 +168,36 @@ void run_from_cli_default(const char* argv[]) {
 
 }
 
+void all_tests_runner(const char* argv[], int i, int argc){
+    test_solve_square();
+    test_solve_line();
+    test_double_is_same();
+}
 
+void print_documentation(const char* argv[], int i, int argc) {
+        printf("\n\n\n******************************************\n"
+               "Программа для решения квадратного уравнения.\n"
+               "Дополнительные флаги запуска:\n"
+               "-h (--help): информация о программе.\n"
+               "-t (--tests): запуск с тестами.\n"
+               "-f (--file) file_name.txt: поиск корней по коэффицентам из файла.\n"
+               "Также сразу после .exe файла можно ввести три\n"
+               "последовательных действительных числа и программа выдаст их корни.\n"
+               "Для обычного запуска введите .exe файл.\n"
+               "******************************************\n\n\n");
+}
+
+void initialization_flags(Flags arr_with_flags[]){
+
+    arr_with_flags[0].short_flag = "-h";
+    arr_with_flags[0].long_flag = "--help";
+    arr_with_flags[0].func = print_documentation;
+
+    arr_with_flags[1].short_flag = "-f";
+    arr_with_flags[1].long_flag = "--file";
+    arr_with_flags[1].func = input_coeff_by_file;
+
+    arr_with_flags[2].short_flag = "-t";
+    arr_with_flags[2].long_flag = "--tests";
+    arr_with_flags[2].func = all_tests_runner;
+}
