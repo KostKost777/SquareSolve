@@ -9,7 +9,7 @@
 #include "double_operations.h"
 #include "UI.h"
 
-
+///@file
 
 
 /**
@@ -17,11 +17,8 @@
     @brief End of file check function
 **/
 
+
 bool chek_correct_input(double* input);
-
-
-
-
 
 
 bool chek_correct_input(double* input)
@@ -38,7 +35,7 @@ bool chek_correct_input(double* input)
 
     int ch = 0;
 
-    if ( status && ((ch = getchar()) == '\n')) {
+    if (status && ((ch = getchar()) == '\n')) {
         return false;
     }
 
@@ -60,7 +57,7 @@ void get_square_coeff(Equation* quadratic)
 
     int counter = 0;
     do {
-        if(counter == 0)
+        if (counter == 0)
             printf("Введите три действительных коэффицента ax^2 + bx + c через пробел:\n");
 
         printf("Введите коэффицент %c: ", arr_char_coeff[counter]);
@@ -68,17 +65,16 @@ void get_square_coeff(Equation* quadratic)
         da_ne_bombit_y_menya = chek_correct_input(arr_coeff[counter]);
 
 
-        if (da_ne_bombit_y_menya){
+        if (da_ne_bombit_y_menya) {
             counter = 0;
             continue;
         }
         counter++;
 
 
-    }while(counter !=  3);
+    } while(counter !=  3);
 
 }
-
 
 void print_roots(const Equation* quadratic)
 {
@@ -87,7 +83,7 @@ void print_roots(const Equation* quadratic)
     assert(isfinite(quadratic->roots.x1));
     assert(isfinite(quadratic->roots.x2));
 
-    switch(quadratic->roots.ans_number_of_x){
+    switch (quadratic->roots.ans_number_of_x) {
         case inf_roots:
             printf("Количество корней бесконечно\n");
             break;
@@ -106,6 +102,7 @@ void print_roots(const Equation* quadratic)
                                                                 quadratic->roots.x1,
                                                                 quadratic->roots.x2);
             break;
+
         default:
             break;
      }

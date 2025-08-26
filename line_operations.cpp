@@ -8,6 +8,7 @@
 #include "line_operations.h"
 #include "equation_solve.h"
 
+///@file
 void skip_line(void)
 {
     int ch = 0;

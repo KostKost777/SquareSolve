@@ -1,7 +1,6 @@
-
 #ifndef line_operations
 #define line_operations
-
+///@file
 
 /**
 

@@ -7,6 +7,7 @@
 #include "double_operations.h"
 #include "equation_solve.h"
 
+///@file
 const double EPS = 1E-7;
 
 bool double_is_same(double num1, double num2)
@@ -22,7 +23,7 @@ bool double_is_same(double num1, double num2)
 void remove_minus_zero(double* num){
     assert(num != NULL);
 
-    if(double_is_same(*num, -0))
+    if (double_is_same(*num, -0))
         *num = 0;
 }
 

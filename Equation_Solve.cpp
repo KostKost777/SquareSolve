@@ -7,8 +7,8 @@
 #include "equation_solve.h"
 #include "line_operations.h"
 #include "double_operations.h"
+///@file
 
-//*******************SS************************
 void solve_square(Equation* quadratic)
 {
     assert(quadratic != NULL);
@@ -17,16 +17,16 @@ void solve_square(Equation* quadratic)
     assert(isfinite(quadratic->coeff.c));
 
     if (double_is_same(quadratic->coeff.a, 0))
-        solve_liner(quadratic);
+        solve_line(quadratic);
 
-    else if(double_is_same(quadratic->coeff.c, 0)){
+    else if (double_is_same(quadratic->coeff.c, 0)) {
             quadratic->roots.x1 = max(0.0, -quadratic->coeff.b / quadratic->coeff.a);
             quadratic->roots.x2 = min(0.0, -quadratic->coeff.b / quadratic->coeff.a);
             remove_minus_zero(&quadratic->roots.x1);
             remove_minus_zero(&quadratic->roots.x2);
             quadratic->roots.ans_number_of_x = two_roots;
     }
-    else{
+    else {
 
         double dis = quadratic->coeff.b * quadratic->coeff.b -
                             4 * quadratic->coeff.a * quadratic->coeff.c;
@@ -40,7 +40,7 @@ void solve_square(Equation* quadratic)
             quadratic->roots.ans_number_of_x = one_roots;
         }
 
-        else if (dis < 0){
+        else if (dis < 0) {
             quadratic->roots.ans_number_of_x = zero_roots;
             quadratic->roots.x1 = 0;
             quadratic->roots.x2 = 0;
@@ -52,8 +52,10 @@ void solve_square(Equation* quadratic)
                                       (-quadratic->coeff.b - sqrt_dis) /
                                                 (2 * quadratic->coeff.a));
 
-            quadratic->roots.x2 = min((-quadratic->coeff.b + sqrt_dis) / (2 * quadratic->coeff.a),
-                                      (-quadratic->coeff.b - sqrt_dis) / (2 * quadratic->coeff.a));
+            quadratic->roots.x2 = min((-quadratic->coeff.b + sqrt_dis) /
+                                                            (2 * quadratic->coeff.a),
+                                      (-quadratic->coeff.b - sqrt_dis) /
+                                                            (2 * quadratic->coeff.a));
             remove_minus_zero(&quadratic->roots.x1);
             remove_minus_zero(&quadratic->roots.x2);
             quadratic->roots.ans_number_of_x = two_roots;
@@ -61,25 +63,26 @@ void solve_square(Equation* quadratic)
     }
 }
 
-//*******************SS************************
 
-void solve_liner(Equation* quadratic)
+void solve_line(Equation* quadratic)
 {
     assert(quadratic != NULL);
     assert(isfinite(quadratic->coeff.b));
     assert(isfinite(quadratic->coeff.c));
 
-    if (double_is_same(quadratic->coeff.b, 0) && double_is_same(quadratic->coeff.c, 0)){
+    if (double_is_same(quadratic->coeff.b, 0) && double_is_same(quadratic->coeff.c, 0)) {
         quadratic->roots.ans_number_of_x = inf_roots; // 0 = 0
         quadratic->roots.x1 = 0;
         quadratic->roots.x2 = 0;
     }
-    else if (double_is_same(quadratic->coeff.b, 0) && !double_is_same(quadratic->coeff.c, 0)){
+    else if (double_is_same(quadratic->coeff.b, 0) && !double_is_same(quadratic->coeff.c, 0))
+    {
         quadratic->roots.ans_number_of_x = zero_roots;  // c = 0
         quadratic->roots.x1 = 0;
         quadratic->roots.x2 = 0;
     }
-    else if(!double_is_same(quadratic->coeff.b, 0) && !double_is_same(quadratic->coeff.c, 0)){
+    else if (!double_is_same(quadratic->coeff.b, 0) && !double_is_same(quadratic->coeff.c, 0))
+    {
         quadratic->roots.x1 = -quadratic->coeff.c / quadratic->coeff.b;
         quadratic->roots.x2 = -quadratic->coeff.c / quadratic->coeff.b; // bx + c = 0
 
@@ -92,5 +95,4 @@ void solve_liner(Equation* quadratic)
         quadratic->roots.x2 = 0;                // bx = 0
         quadratic->roots.ans_number_of_x = one_roots;
     }
-
 }

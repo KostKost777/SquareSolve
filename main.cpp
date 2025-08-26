@@ -11,11 +11,12 @@
 #include "unit_tests.h"
 #include "UI.h"
 
-int check_flags(int argc, char* argv[]);
-void input_coeff_by_file(char* argv);
+int check_flags(int argc, const char* argv[]);
+void input_coeff_by_file(const char* argv[], int i, int argc);
 bool char_is_num(int num);
+void run_from_cli_default(const char* argv[]);
 
-
+///@file
 
 
 
@@ -23,10 +24,12 @@ bool char_is_num(int num);
 
 // -h
 // ./main -h (--help)
-int main(int argc, char* argv[]) // argc argv
-{
 
-    if(!(check_flags(argc, argv))){
+
+int main(int argc, const char* argv[]) // argc argv
+{
+    printf("biba\n");
+    if (!(check_flags(argc, argv))) {
         Equation quadratic = {};
 
         get_square_coeff(&quadratic);
@@ -35,8 +38,7 @@ int main(int argc, char* argv[]) // argc argv
 
         print_roots(&quadratic);
     }
-
-
+    printf("\nboba");
 }
 
 // -f, --file
@@ -46,28 +48,23 @@ int main(int argc, char* argv[]) // argc argv
 // file_name
 // ./main
 // ./main 1 2 3
-int check_flags(int argc, char* argv[]){
-    if(argc > 1){
-        if(argc == 4){
-            int a = *argv[1];
-            int b = *argv[2];
-            int c = *argv[3];
-            char* endptr;
-            if(char_is_num(a) && char_is_num(b) && char_is_num(c)){
-                    Equation quadratic_once;
-                    quadratic_once.coeff.a = strtod(argv[1], &endptr);
-                    quadratic_once.coeff.b = strtod(argv[2], &endptr);
-                    quadratic_once.coeff.c = strtod(argv[3], &endptr);
-                    solve_square(&quadratic_once);
-                    print_roots(&quadratic_once);
-                    return 1;
-                }
+// sabc123
+// 123dsfjhsdjhk
+// 123\0
+// if (*endptr != '\0')
 
+
+int check_flags(int argc, const char* argv[]) {
+    // for loop: if (strcmp(name, flag_name)) {do_flag();}
+    if (argc > 1) {
+        if (argc == 4) {
+            run_from_cli_default(argv);
+            return 1;
 
         }
-        else{
-            for(int i = 1; i < argc; ++i){
-                if(!(strcmp(argv[i], "-h")) || !(strcmp(argv[i], "--help"))){
+        else {
+            for (int i = 1; i < argc; ++i) {
+                if (!(strcmp(argv[i], "-h")) || !(strcmp(argv[i], "--help"))) {
                     printf("\n\n\n******************************************\n"
                            "Программа для решения квадратного уравнения.\n"
                            "Дополнительные флаги запуска:\n"
@@ -79,33 +76,18 @@ int check_flags(int argc, char* argv[]){
                            "Для обычного запуска введите .exe файл.\n"
                            "******************************************\n\n\n");
                     return 1;
-                    }
-
-
-                else if(!(strcmp(argv[i], "-t")) || !(strcmp(argv[i], "--tests"))){
-                    TestSolveSquare();
-                    TestSolveLiner();
-                    TestDoubleIsSame();
+                }
+                else if (!(strcmp(argv[i], "-t")) || !(strcmp(argv[i], "--tests"))) {
+                    test_solve_square();
+                    test_solve_line();
+                    test_double_is_same();
                     return 0;
                 }
-                else if(!(strcmp(argv[i], "-f")) || !(strcmp(argv[i], "--file"))){
-                    if(i + 1 > argc - 1){ //проверка выхода за границы массива
-                        bool fl = 0;
-                        char inp[100];
-                        do{
-                            printf("Введите файл разрешения .txt:  ");
-                            scanf("%s", inp);
-                            if(!strstr(inp, ".txt")) continue;
-                            else fl = 1;
-
-                        }while(fl != 1);
-
-                        input_coeff_by_file(inp);
-                    }else
-                        input_coeff_by_file(argv[i + 1]);
+                else if (!(strcmp(argv[i], "-f")) || !(strcmp(argv[i], "--file"))) {
+                    // argv, argc, i
+                    input_coeff_by_file(argv, i, argc);
                     return 1;
                 }
-
             }
         }
     }
@@ -113,37 +95,75 @@ int check_flags(int argc, char* argv[]){
 }
 
 
-void input_coeff_by_file(char* argv){
+void input_coeff_by_file(const char* argv[], int i, int argc) {
     assert(argv != NULL);
-    FILE *input_file;
-    input_file = fopen(argv, "r");
+    assert(isfinite(i));
+    assert(isfinite(argc));
+
+    FILE *input_file = NULL;
+    char inp_file_name[260] = "";
+    printf("Вы забыли ввести имя файла\n");
+
+    if (i + 1 > argc - 1) { //проверка выхода за границы массива
+        do {
+            printf("Введите существующий файл:  ");
+            scanf("%260s", inp_file_name);
+            input_file = fopen(inp_file_name, "r");
+            if (input_file == NULL)
+                continue;
+            else
+                break;
+
+        } while(true);
+
+    } else
+        strncpy(inp_file_name, argv[i + 1], 260);
+
     assert(input_file != NULL);
     int status = 0;
 
     do {
         Equation quadratic_input;
-        Ans_SolveSquare inp;
         status = fscanf(input_file, "a = %lf b = %lf c = %lf\n",
-                                    &inp.a, &inp.b, &inp.c);
+                                    &quadratic_input.coeff.a,
+                                    &quadratic_input.coeff.b,
+                                    &quadratic_input.coeff.c);
+        if (status == -1)
+            break;
 
-        if(status == -1) break;
-
-        quadratic_input.coeff.a = inp.a;
-        quadratic_input.coeff.b = inp.b;
-        quadratic_input.coeff.c = inp.c;
         solve_square(&quadratic_input);
         printf("\n**************************************************\n");
-        printf("a = %lg b = %lg c = %lg\n", inp.a, inp.b, inp.c);
+        printf("a = %lg b = %lg c = %lg\n",
+                quadratic_input.coeff.a,
+                quadratic_input.coeff.b,
+                quadratic_input.coeff.c);
+
         print_roots(&quadratic_input);
 
-    } while (status != -1);
+    } while (true);
     printf("\n**************************************************\n");
     fclose(input_file);
 }
 
-bool char_is_num(int num){
-    if((num > 47 && num < 58) || num == 45) return 1;
-    return 0;
+void run_from_cli_default(const char* argv[]) {
+    Equation quadratic_once;
+
+    char* endptr_a = NULL;
+    char* endptr_b = NULL;
+    char* endptr_c = NULL;
+    quadratic_once.coeff.a = strtod(argv[1], &endptr_a);
+    quadratic_once.coeff.b = strtod(argv[2], &endptr_b);
+    quadratic_once.coeff.c = strtod(argv[3], &endptr_c);
+
+    if ((*endptr_a == '\0') &&
+        (*endptr_b == '\0') &&
+        (*endptr_c == '\0')) {
+            solve_square(&quadratic_once);
+            print_roots(&quadratic_once);
+        }
+    else
+        printf("Не корректный ввод, читай -h(--help)\n");
+
 }
 
 

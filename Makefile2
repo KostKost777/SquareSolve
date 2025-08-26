@@ -3,24 +3,22 @@ FLAGS=-Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal 
 all: out
 
 out: main.o Unit_Tests.o UI.o double_operations.o Equation_Solve.o line_operations.o
-	g++ main.o Unit_Tests.o UI.o double_operations.o Equation_Solve.o line_operations.o
+	g++ main.o Unit_Tests.o UI.o double_operations.o Equation_Solve.o line_operations.o -o out
 
 main.o: main.cpp
-	g++ $(FLAGS) -c main.cpp
+	g++ -c main.cpp
 
 Unit_Tests.o: Unit_Tests.cpp
-	g++ $(FLAGS) -c Unit_Tests.cpp
+	g++ -c Unit_Tests.cpp
 
 UI.o: UI.cpp
-	g++ $(FLAGS) -c UI.cpp
+	g++ -c UI.cpp
 
 double_operations.o: double_operations.cpp
-	g++ $(FLAGS) -c double_operations.cpp
+	g++ -c double_operations.cpp
 
 Equation_Solve.o: Equation_Solve.cpp
-	g++ $(FLAGS) -c Equation_Solve.cpp
+	g++ -c Equation_Solve.cpp
 
 line_operations.o: line_operations.cpp
-	g++ $(FLAGS) -c line_operations.cpp
-
- 
+	g++ -c line_operations.cpp

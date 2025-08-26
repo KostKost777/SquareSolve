@@ -1,7 +1,9 @@
 #ifndef equation_solve
 #define equation_solve
 
-enum Number_of_roots
+///@file
+
+enum NumberOfRoots
 {
     inf_roots = -1,
     zero_roots,
@@ -9,20 +11,13 @@ enum Number_of_roots
     two_roots
 };
 
-struct Ans_SolveSquare
-{
-    double a;
-    double b;
-    double c;
-    Number_of_roots n_roots;
-    double x1;
-    double x2;
-};
 
-struct Roots{
+
+
+struct Roots {
     double x1;
     double x2;
-    Number_of_roots ans_number_of_x;
+    NumberOfRoots ans_number_of_x;
 };
 
 struct Coeffs {
@@ -56,6 +51,6 @@ void solve_square(Equation* quadratic);
 * @param c constant term
 **/
 
-void solve_liner(Equation *quadratic);
+void solve_line(Equation *quadratic);
 
 #endif

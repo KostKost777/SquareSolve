@@ -1,6 +1,8 @@
 #ifndef double_operations
 #define double_operations
 
+///@file
+
 /**
  *
  * @brief Checks if two variables of type double are equal
