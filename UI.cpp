@@ -8,6 +8,8 @@
 #include "skipline.h"
 #include "double_operations.h"
 #include "UI.h"
+#include "my_assert.h"
+#include "print_many_stars.h"
 
 ///@file
 
@@ -17,10 +19,10 @@
 **/
 
 
-bool chek_correct_input(double* input);
+static int chek_correct_input(double* input);
 
 
-bool chek_correct_input(double* input)
+int chek_correct_input(double* input)
 {
     assert(input != NULL);
 
@@ -29,30 +31,31 @@ bool chek_correct_input(double* input)
 
     if (status == -1) {
         printf("GG WP");
-        exit(0);
+        return -1;
     }
 
     int ch = 0;
 
     if (status && ((ch = getchar()) == '\n')) {
-        return false;
+        return 0;
     }
 
     skip_line();
-    return true;
+    return 1;
 }
 
-void get_square_coeff(Equation* quadratic)
+int get_square_coeff(Equation* quadratic)
 {
     assert(quadratic != NULL);
     assert(isfinite(quadratic->coeff.a));
     assert(isfinite(quadratic->coeff.b));
     assert(isfinite(quadratic->coeff.c));
 
+    const int NumberOfCoeffs = 3;
 
-    bool da_ne_bombit_y_menya;
-    char arr_char_coeff[3] = {'a', 'b', 'c'};
-    double* arr_coeff[3] = {&quadratic->coeff.a, &quadratic->coeff.b, &quadratic->coeff.c};
+    int  da_ne_bombit_y_menya = 0;
+    char arr_char_coeff[NumberOfCoeffs] = {'a', 'b', 'c'};
+    double* arr_coeff[NumberOfCoeffs] = {&quadratic->coeff.a, &quadratic->coeff.b, &quadratic->coeff.c};
 
     int counter = 0;
     do {
@@ -64,15 +67,17 @@ void get_square_coeff(Equation* quadratic)
         da_ne_bombit_y_menya = chek_correct_input(arr_coeff[counter]);
 
 
-        if (da_ne_bombit_y_menya) {
+        if (da_ne_bombit_y_menya == 1) {
             counter = 0;
             continue;
         }
+
+        if (da_ne_bombit_y_menya == -1) return 1;
         counter++;
 
 
-    } while(counter !=  3);
-
+    } while(counter !=  NumberOfCoeffs);
+    return 0;
 }
 
 void print_roots(const Equation* quadratic)
@@ -81,7 +86,7 @@ void print_roots(const Equation* quadratic)
     assert(isfinite((int)quadratic->roots.ans_number_of_x));
     assert(isfinite(quadratic->roots.x1));
     assert(isfinite(quadratic->roots.x2));
-
+    print_stars_func();
     switch (quadratic->roots.ans_number_of_x) {
         case inf_roots:
             printf("Количество корней бесконечно\n");
@@ -105,4 +110,5 @@ void print_roots(const Equation* quadratic)
         default:
             break;
      }
+     print_stars_func();
 }

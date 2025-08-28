@@ -6,11 +6,13 @@
 
 #include "double_operations.h"
 #include "unit_tests_doubleissame.h"
+#include "my_assert.h"
+#include "print_many_stars.h"
 
 
 void test_double_is_same() {
 
-    FILE *file_test;
+    FILE *file_test = NULL;
     file_test = fopen("TestDoubleIsSame.txt", "r");
     assert(file_test != NULL);
     while (true) {

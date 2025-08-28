@@ -7,19 +7,21 @@
 #include "unit_tests_solvesquare.h"
 #include "equation_solve.h"
 #include "double_operations.h"
+#include "my_assert.h"
+#include "print_many_stars.h"
 
 void test_solve_square()
 {
 
-    FILE *file_test;
+    FILE *file_test = NULL;
     file_test = fopen("TestSolveSquare.txt", "r");
     assert(file_test != NULL);
 
 
     while (true) {
         int status = 0;
-        Equation quadratic_test;
-        Equation answer;
+        Equation quadratic_test = {};
+        Equation answer = {};
         int answer_n_roots = 0;
         status = fscanf(file_test, "a: %lf b: %lf c: %lf n_r: %d x1 = %lf x2 = %lf\n",
                                     &answer.coeff.a, &answer.coeff.b, &answer.coeff.c,

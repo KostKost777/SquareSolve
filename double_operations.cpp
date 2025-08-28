@@ -6,6 +6,19 @@
 
 #include "double_operations.h"
 #include "equation_solve.h"
+#include "my_assert.h"
+
+// __func__
+// __PRETTY_FUNCTION__
+//
+//
+//
+
+// assert(condition, return 1);
+                                          \
+
+//
+// functional_assert(condition, code)
 
 ///@file
 

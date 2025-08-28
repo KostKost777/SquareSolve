@@ -7,6 +7,7 @@
 
 #include "skipline.h"
 #include "equation_solve.h"
+#include "my_assert.h"
 
 /// @file
 void skip_line(void)

@@ -7,6 +7,7 @@
 #include "equation_solve.h"
 #include "skipline.h"
 #include "double_operations.h"
+#include "my_assert.h"
 
 ///@file
 

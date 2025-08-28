@@ -11,7 +11,7 @@
 **/
 
 
-void get_square_coeff(Equation* quadratic);
+int get_square_coeff(Equation* quadratic);
 
 /**
  *

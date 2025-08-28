@@ -6,7 +6,7 @@
 **    @brief Function for testing double_is_same function
 **/
 
-void test_double_is_same();
+void test_double_is_same(void);
 
 /**
     @brief Structure for testing double using unit tests
