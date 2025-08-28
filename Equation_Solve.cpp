@@ -5,8 +5,9 @@
 #include <stdlib.h>
 
 #include "equation_solve.h"
-#include "line_operations.h"
+#include "skipline.h"
 #include "double_operations.h"
+
 ///@file
 
 void solve_square(Equation* quadratic)

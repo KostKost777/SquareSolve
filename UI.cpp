@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #include "equation_solve.h"
-#include "line_operations.h"
+#include "skipline.h"
 #include "double_operations.h"
 #include "UI.h"
 
@@ -13,7 +13,6 @@
 
 
 /**
-
     @brief End of file check function
 **/
 

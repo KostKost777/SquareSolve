@@ -2,14 +2,23 @@ FLAGS=-Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal 
 
 all: out
 
-out: main.o Unit_Tests.o UI.o double_operations.o Equation_Solve.o line_operations.o
-	g++ main.o Unit_Tests.o UI.o double_operations.o Equation_Solve.o line_operations.o -o out
+out: main.o console_interface.o unit_tests_solvesquare.o unit_tests_doubleissame.o unit_tests_solveline.o UI.o double_operations.o Equation_Solve.o skipline.o
+	g++ main.o console_interface.o unit_tests_solvesquare.o unit_tests_doubleissame.o unit_tests_solveline.o UI.o double_operations.o Equation_Solve.o skipline.o -o out
 
 main.o: main.cpp
 	g++ -c main.cpp
 
-Unit_Tests.o: Unit_Tests.cpp
-	g++ -c Unit_Tests.cpp
+console_interface.o: console_interface.cpp
+	g++ -c console_interface.cpp
+
+unit_tests_solvesquare.o: unit_tests_solvesquare.cpp
+	g++ -c unit_tests_solvesquare.cpp
+
+unit_tests_solveline.o: unit_tests_solveline.cpp
+	g++ -c unit_tests_solveline.cpp
+
+unit_tests_doubleissame.o: unit_tests_doubleissame.cpp
+	g++ -c unit_tests_doubleissame.cpp
 
 UI.o: UI.cpp
 	g++ -c UI.cpp
@@ -20,5 +29,6 @@ double_operations.o: double_operations.cpp
 Equation_Solve.o: Equation_Solve.cpp
 	g++ -c Equation_Solve.cpp
 
-line_operations.o: line_operations.cpp
-	g++ -c line_operations.cpp
+skipline.o: skipline.cpp
+	g++ -c skipline.cpp
+
