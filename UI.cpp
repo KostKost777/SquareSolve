@@ -65,8 +65,6 @@ int get_square_coeff(Equation* quadratic)
         printf("Введите коэффицент %c: ", arr_char_coeff[counter]);
 
         da_ne_bombit_y_menya = chek_correct_input(arr_coeff[counter]);
-
-
         if (da_ne_bombit_y_menya == 1) {
             counter = 0;
             continue;
@@ -87,6 +85,7 @@ void print_roots(const Equation* quadratic)
     assert(isfinite(quadratic->roots.x1));
     assert(isfinite(quadratic->roots.x2));
     print_stars_func();
+
     switch (quadratic->roots.ans_number_of_x) {
         case inf_roots:
             printf("Количество корней бесконечно\n");
@@ -108,7 +107,7 @@ void print_roots(const Equation* quadratic)
             break;
 
         default:
-            break;
+            assert(0 && "Vse ploho");
      }
      print_stars_func();
 }

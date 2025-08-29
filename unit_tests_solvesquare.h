@@ -2,13 +2,9 @@
 #define unit_tests_solvesquare
 
 #include "equation_solve.h"
-///@file
 
-/**
-**    @brief Function for testing quadratic equation function
-**/
 
-int test_solve_square();
+int test_solve_square(void);
 
 /**
     @brief Function to convert from int to enum

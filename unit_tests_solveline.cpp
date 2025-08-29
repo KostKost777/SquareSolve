@@ -14,21 +14,17 @@
 NumberOfRoots convert_from_int(int num)
 {
     switch(num){
-        case -1:
+        case inf_roots:
             return inf_roots;
-            break;
         case 0:
             return zero_roots;
-            break;
         case 1:
             return one_roots;
-            break;
         case 2:
             return two_roots;
-            break;
         default:
+            assert(0 && "Vse ploho");
             return inf_roots;
-            break;
         }
 }
 

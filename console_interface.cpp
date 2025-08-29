@@ -15,6 +15,11 @@
 #include "my_assert.h"
 #include "print_many_stars.h"
 
+static int check_help_flag(const int argc, const char* argv[],
+                                Flags arr_with_flags[], const int NumberOfFlags);
+
+static FILE* get_exist_filename(char inp_file_name[]);
+
 void input_coeff_by_file(const char* argv[],const int pos,const int argc,
                          Flags arr_with_flags[], const int NumberOfFlags) {
     (void)arr_with_flags;
@@ -22,35 +27,16 @@ void input_coeff_by_file(const char* argv[],const int pos,const int argc,
 
     assert(argv != NULL);
 
-    FILE *input_file = NULL;
+    FILE* input_file = NULL;
     const int MAX_SIZE_FILE_NAME = 260;
     char inp_file_name[MAX_SIZE_FILE_NAME] = "";
 
-    if (pos + 1 > argc - 1) { //проверка выхода за границы массива
-        printf("¬ведите им€ файла:  ");
-        while(true){
+    if (pos + 1 > argc - 1)  //проверка выхода за границы массива
+        input_file = get_exist_filename(inp_file_name);
 
-            scanf("%260s", inp_file_name);
-            input_file = fopen(inp_file_name, "r");
-            if (input_file == NULL){
-                printf("¬ведите существующий файл:  ");
-                continue;
-            }
-
-            else
-                break;
-        }
-
-    } else {
+     else {
         strncpy(inp_file_name, argv[pos + 1], MAX_SIZE_FILE_NAME);
-        input_file = fopen(inp_file_name, "r");
-        if(input_file == NULL){
-            while(input_file == NULL){
-                printf("¬ведите существующий файл:");
-                scanf("%260s", inp_file_name);
-                input_file = fopen(inp_file_name, "r");
-            }
-        }
+        input_file = get_exist_filename(inp_file_name);
     }
 
     assert(input_file != NULL);
@@ -73,16 +59,13 @@ void input_coeff_by_file(const char* argv[],const int pos,const int argc,
                 quadratic_input.coeff.c);
 
         print_roots(&quadratic_input);
-
     }
     print_stars_func();
     fclose(input_file);
 }
-// file, line, func, assert(condition)
-// #define
-// __FILE__, __LINE__, __func__
 
 void run_from_cli_default(const char* argv[]) {
+    assert(argv != NULL);
     Equation quadratic_once = {};
 
     char* endptr_a = NULL;
@@ -110,8 +93,8 @@ void all_tests_runner(const char* argv[], const int pos, const int argc,
     (void)argc;
     (void)arr_with_flags;
     (void)NumberOfFlags;
-    int tests_failed = 0;
 
+    int tests_failed = 0;
     tests_failed += test_solve_square();
     tests_failed += test_solve_line();
     tests_failed += test_double_is_same();
@@ -152,6 +135,32 @@ int custom_run_with_flags(const int argc, const char* argv[],
 
     const int DefaultInputNumbers = 4;
 
+    if(check_help_flag(argc, argv, arr_with_flags, NumberOfFlags))
+        return 1;
+
+    if (argc == DefaultInputNumbers){
+            run_from_cli_default(argv);
+            return 0;
+    }
+    for (int pos = 1; pos < argc; ++pos) {
+        for (int fl_pos = 0; fl_pos < NumberOfFlags; fl_pos++) {
+            if ((strcmp(argv[pos], arr_with_flags[fl_pos].short_flag) == 0) ||
+                (strcmp(argv[pos], arr_with_flags[fl_pos].long_flag)  == 0)){
+                arr_with_flags[fl_pos].func(argv, pos, argc,
+                                            arr_with_flags, NumberOfFlags);
+            }
+        }
+    }
+    return 0;
+}
+
+
+static int check_help_flag(const int argc, const char* argv[],
+                                Flags arr_with_flags[], const int NumberOfFlags){
+
+    assert(arr_with_flags != NULL);
+    assert(argv != NULL);
+
     for (int h_i = 0; h_i < argc; ++h_i) { //проверка наличи€ флага -h, высший приоритет
         if((strcmp(argv[h_i], "-h") == 0 ||
             strcmp(argv[h_i], "--help") == 0) && (h_i != 0)){
@@ -160,25 +169,16 @@ int custom_run_with_flags(const int argc, const char* argv[],
             return 1;
         }
     }
-
-    if (argc == DefaultInputNumbers) {
-            run_from_cli_default(argv);
-    }
-
-    else {
-        for (int pos = 1; pos < argc; ++pos) {
-            for (int fl_pos = 0; fl_pos < NumberOfFlags; fl_pos++) {
-                if ((strcmp(argv[pos], arr_with_flags[fl_pos].short_flag) == 0) ||
-                    (strcmp(argv[pos], arr_with_flags[fl_pos].long_flag)  == 0)){
-                    arr_with_flags[fl_pos].func(argv, pos, argc,
-                                                arr_with_flags, NumberOfFlags);
-                }
-            }
-        }
-    }
     return 0;
 }
 
-
-
-
+static FILE* get_exist_filename(char inp_file_name[]){
+    assert(inp_file_name != NULL);
+    FILE* input_file = fopen(inp_file_name, "r");
+    while(input_file == NULL){
+        printf("¬ведите существующий файл:  ");
+        scanf("%260s", inp_file_name);
+        input_file = fopen(inp_file_name, "r");
+    }
+    return input_file;
+}

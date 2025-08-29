@@ -20,19 +20,24 @@
 //
 // functional_assert(condition, code)
 
-///@file
-
-/**
-** @brief Permissible error constant
-**/
-const double EPS = 1E-7;
-
 bool double_is_same(double num1, double num2)
 {
     assert(isfinite(num1));
     assert(isfinite(num2));
 
     return fabs(num1 - num2) < EPS;
+}
+
+/**
+** @brief Permissible error constant
+**/
+
+bool comparison_of_double(double num1, double num2)
+{
+    assert(isfinite(num1));
+    assert(isfinite(num2));
+
+    return (num1 - num2) > EPS;
 }
 
 void remove_minus_zero(double* num){
