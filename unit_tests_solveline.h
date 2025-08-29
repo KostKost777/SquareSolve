@@ -6,6 +6,6 @@
 **    @brief Function for testing line equation function
 **/
 
-void test_solve_line();
+int test_solve_line();
 
 #endif

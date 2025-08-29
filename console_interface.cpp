@@ -41,7 +41,7 @@ void input_coeff_by_file(const char* argv[],const int pos,const int argc,
                 break;
         }
 
-    } else{
+    } else {
         strncpy(inp_file_name, argv[pos + 1], MAX_SIZE_FILE_NAME);
         input_file = fopen(inp_file_name, "r");
         if(input_file == NULL){
@@ -110,10 +110,12 @@ void all_tests_runner(const char* argv[], const int pos, const int argc,
     (void)argc;
     (void)arr_with_flags;
     (void)NumberOfFlags;
+    int tests_failed = 0;
 
-    test_solve_square();
-    test_solve_line();
-    test_double_is_same();
+    tests_failed += test_solve_square();
+    tests_failed += test_solve_line();
+    tests_failed += test_double_is_same();
+    printf("%d тестов с ошибкой\n", tests_failed);
 }
 
 void print_documentation(const char* argv[], const int pos, const int argc,
@@ -134,11 +136,14 @@ void print_documentation(const char* argv[], const int pos, const int argc,
 int run_interactive_default() {
     Equation quadratic = {};
     int status_EOF = 0;
+
     status_EOF = get_square_coeff(&quadratic);
     if (status_EOF)
         return 1;
+
     solve_square(&quadratic);
     print_roots(&quadratic);
+
     return 0;
 }
 

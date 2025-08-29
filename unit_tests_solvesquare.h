@@ -8,7 +8,7 @@
 **    @brief Function for testing quadratic equation function
 **/
 
-void test_solve_square();
+int test_solve_square();
 
 /**
     @brief Function to convert from int to enum

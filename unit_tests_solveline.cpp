@@ -32,11 +32,11 @@ NumberOfRoots convert_from_int(int num)
         }
 }
 
-void test_solve_line() {
+int test_solve_line() {
     FILE *file_test = NULL;
     file_test = fopen("TestSolveSquare.txt", "r");
     assert(file_test != NULL);
-
+    int tests_failed = 0;
 
     while (true) {
         int status = 0;
@@ -62,15 +62,18 @@ void test_solve_line() {
                 double_is_same(quadratic_test.roots.x1, answer.roots.x1) &&
                 double_is_same(quadratic_test.roots.x2, answer.roots.x2))) {
 
-         printf("Error b = %lg, c = %lg \nx1 = %lg \n n_r = %d \n Correct: x1_c = %lg\n",
-                answer.coeff.b, answer.coeff.c,
-                quadratic_test.roots.x1,
-                quadratic_test.roots.ans_number_of_x,
-                answer.roots.x1);
+             printf("Error b = %lg, c = %lg \nx1 = %lg \n n_r = %d \n Correct: x1_c = %lg\n",
+                    answer.coeff.b, answer.coeff.c,
+                    quadratic_test.roots.x1,
+                    quadratic_test.roots.ans_number_of_x,
+                    answer.roots.x1);
+            tests_failed++;
+
         }
 
     }
     fclose(file_test);
+    return tests_failed;
 }
 
 

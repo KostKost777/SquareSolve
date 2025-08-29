@@ -10,11 +10,13 @@
 #include "print_many_stars.h"
 
 
-void test_double_is_same() {
+int test_double_is_same() {
 
     FILE *file_test = NULL;
     file_test = fopen("TestDoubleIsSame.txt", "r");
     assert(file_test != NULL);
+    int tests_failed = 0;
+
     while (true) {
     int status = 0;
         TestSuiteDoubleIsSame answer = {};
@@ -30,9 +32,11 @@ void test_double_is_same() {
                             answer.num1, answer.num2,
                             double_is_same(answer.num1, answer.num2),
                             answer.verdict);
+            tests_failed++;
         }
     }
     fclose(file_test);
+    return tests_failed;
 }
 
 

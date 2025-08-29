@@ -5,6 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+// -I
+// src/...
+// include/...
+// test/...
+
+
 #include "equation_solve.h"
 #include "skipline.h"
 #include "double_operations.h"
@@ -15,9 +21,6 @@
 #include "UI.h"
 #include "my_assert.h"
 #include "print_many_stars.h"
-
-
-
 
 //*********************************MAIN**************************************
 
@@ -39,7 +42,8 @@ int main(const int argc, const char* argv[])
     if (argc > 1){
         int status_exit = 0;
         status_exit = custom_run_with_flags(argc, argv, arr_with_flags, NumberOfFlags);
-        if(status_exit) return 0;
+        if(status_exit)
+            return 0;
     }
     else {
         int status_EOF = 0;
@@ -48,7 +52,7 @@ int main(const int argc, const char* argv[])
             return 0;
     }
 
-    printf("\nboba");
+    printf("boba");
     return 0;
 }
 
