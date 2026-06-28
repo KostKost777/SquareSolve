@@ -11,15 +11,14 @@
     @param func pointer to flag function
 **/
 
-
-struct Flags {
+struct Flags 
+{
     const char* short_flag;
     const char* long_flag;
     void (*func)(const char* argv[], const int pos, const int argc,
                  Flags arr_with_flags[], const int NumberOfFlags);
     const char* doc;
 };
-
 
 /**
     @brief Function for console input from file
