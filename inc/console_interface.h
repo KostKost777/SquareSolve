@@ -1,8 +1,14 @@
 #ifndef console_interface
 #define console_interface
 
-///@file
+enum FlagType
+{
+    HELP_FLAG,
+    TEST_TEST,
+    RUN_FROM_FILE_FLAG
+}
 
+///@file
 
 /**
     @brief Structure for console startup flags
@@ -13,11 +19,11 @@
 
 struct Flags 
 {
-    const char* short_flag;
-    const char* long_flag;
-    void (*func)(const char* argv[], const int pos, const int argc,
-                 Flags arr_with_flags[], const int NumberOfFlags);
-    const char* doc;
+    const char* short_name;
+    const char* long_name;
+    const char* info;
+
+    void (*func)(const char* argv[], const int argc, struct Flags arr_with_flags[]);
 };
 
 /**

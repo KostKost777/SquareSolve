@@ -1,9 +1,9 @@
-#include <TXLib.h>
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "equation_solve.h"
 #include "double_operations.h"
@@ -11,19 +11,17 @@
 #include "unit_tests_solveline.h"
 #include "unit_tests_doubleissame.h"
 #include "console_interface.h"
-#include "UI.h"
+#include "user_interface.h"
 #include "my_assert.h"
 #include "print_many_stars.h"
 
-static int check_help_flag(const int argc, const char* argv[],
-                                Flags arr_with_flags[], const int NumberOfFlags);
+static int IsHelpFlag(const int argc, const char* argv[], struct Flags flags_arr[]);
 
 static FILE* get_exist_filename(char inp_file_name[]);
 
-void input_coeff_by_file(const char* argv[],const int pos,const int argc,
-                         Flags arr_with_flags[], const int NumberOfFlags) {
-    (void)arr_with_flags;
-    (void)NumberOfFlags;
+void InputFromFile(const char* argv[], const int argc, struct Flags flags_arr[]) 
+{
+    (void)flags_arr;
 
     assert(argv != NULL);
 
@@ -31,7 +29,7 @@ void input_coeff_by_file(const char* argv[],const int pos,const int argc,
     const int MAX_SIZE_FILE_NAME = 260;
     char inp_file_name[MAX_SIZE_FILE_NAME] = "";
 
-    if (pos + 1 > argc - 1)  //проверка выхода за границы массива
+    if (pos + 1 > argc - 1)  //    
         input_file = get_exist_filename(inp_file_name);
 
      else {
@@ -82,36 +80,35 @@ void run_from_cli_default(const char* argv[]) {
             print_roots(&quadratic_once);
         }
     else
-        printf("Не корректный ввод, читай -h(--help)\n");
+        printf("  ,  -h(--help)\n");
 
 }
 
 void all_tests_runner(const char* argv[], const int pos, const int argc,
-                      Flags arr_with_flags[], const int NumberOfFlags){
+                      Flags flags_arr[], const int NumberOfFlags){
     (void)argv;
     (void)pos;
     (void)argc;
-    (void)arr_with_flags;
+    (void)flags_arr;
     (void)NumberOfFlags;
 
     int tests_failed = 0;
     tests_failed += test_solve_square();
     tests_failed += test_solve_line();
     tests_failed += test_double_is_same();
-    printf("%d тестов с ошибкой\n", tests_failed);
+    printf("%d   \n", tests_failed);
 }
 
-void print_documentation(const char* argv[], const int pos, const int argc,
-                         Flags arr_with_flags[], const int NumberOfFlags) {
+void PrintFlagsDocumentation(const char* argv[], const int argc, struct Flags flags_arr[]) {
     (void)argv;
-    (void)pos;
     (void)argc;
     print_stars_func();
-    for(int counter  = 0; counter < NumberOfFlags; ++counter){
-        printf("%s\n", arr_with_flags[counter].doc);
+
+    for(int i = 0; i < NUM_OF_FLAGS; ++i){
+        printf("%s\n", flags_arr[i].info);
     }
 
-    printf("Введите три действ числа и вам выведут корни\n");
+    printf("       \n");
     print_stars_func();
 
 }
@@ -130,12 +127,12 @@ int run_interactive_default() {
     return 0;
 }
 
-int custom_run_with_flags(const int argc, const char* argv[],
-                                Flags arr_with_flags[], const int NumberOfFlags) {
+int CustomRunWithFlags(const int argc, const char* argv[], struct Flags flags_arr[]) 
+{
 
     const int DefaultInputNumbers = 4;
 
-    if(check_help_flag(argc, argv, arr_with_flags, NumberOfFlags))
+    if(IsUserUseHelpFlag(argc, argv, flags_arr))
         return 1;
 
     if (argc == DefaultInputNumbers){
@@ -144,39 +141,42 @@ int custom_run_with_flags(const int argc, const char* argv[],
     }
     for (int pos = 1; pos < argc; ++pos) {
         for (int fl_pos = 0; fl_pos < NumberOfFlags; fl_pos++) {
-            if ((strcmp(argv[pos], arr_with_flags[fl_pos].short_flag) == 0) ||
-                (strcmp(argv[pos], arr_with_flags[fl_pos].long_flag)  == 0)){
-                arr_with_flags[fl_pos].func(argv, pos, argc,
-                                            arr_with_flags, NumberOfFlags);
+            if ((strcmp(argv[pos], flags_arr[fl_pos].short_flag) == 0) ||
+                (strcmp(argv[pos], flags_arr[fl_pos].long_flag)  == 0)){
+                flags_arr[fl_pos].func(argv, pos, argc,
+                                            flags_arr, NumberOfFlags);
             }
         }
     }
     return 0;
 }
 
+static bool IsUserUseHelpFlag(const int argc, const char* argv[], struct Flags flags_arr[])
+{
+    DETAIL_ASSERT(flags_arr);
+    DETAIL_ASSERT(argv);
 
-static int check_help_flag(const int argc, const char* argv[],
-                                Flags arr_with_flags[], const int NumberOfFlags){
-
-    assert(arr_with_flags != NULL);
-    assert(argv != NULL);
-
-    for (int h_i = 0; h_i < argc; ++h_i) { //проверка наличия флага -h, высший приоритет
-        if((strcmp(argv[h_i], "-h") == 0 ||
-            strcmp(argv[h_i], "--help") == 0) && (h_i != 0)){
-            arr_with_flags[0].func(argv, 0, argc,
-                                   arr_with_flags, NumberOfFlags);
-            return 1;
+    for (int i = 1; i < argc; ++i) 
+    {
+        if (IsHelpFlag(argv[i]))
+        {
+            flags_arr[HELP_FLAG].func(argv, argc, flags_arr);
+            return true;
         }
     }
-    return 0;
+    return false;
+}
+
+static bool IsHelpFlag(const char* flag_name)
+{
+    return strcmp(flag_name, "-h") == 0 || strcmp(flag_name, "--help") == 0;
 }
 
 static FILE* get_exist_filename(char inp_file_name[]){
     assert(inp_file_name != NULL);
     FILE* input_file = fopen(inp_file_name, "r");
     while(input_file == NULL){
-        printf("Введите существующий файл:  ");
+        printf("  :  ");
         scanf("%260s", inp_file_name);
         input_file = fopen(inp_file_name, "r");
     }

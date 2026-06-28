@@ -1,6 +1,8 @@
 #ifndef UI
 #define UI
 
+const int NUM_OF_FLAGS = 3;
+
 /// @file
 /**
  *
