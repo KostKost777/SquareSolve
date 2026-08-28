@@ -6,5 +6,5 @@
     @brief Function to skip characters
 **/
 
-void skip_line(void);
+void SkipLine(void);
 #endif

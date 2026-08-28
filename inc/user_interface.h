@@ -1,7 +1,7 @@
 #ifndef UI
 #define UI
 
-const int NUM_OF_FLAGS = 3;
+#define NUM_OF_FLAGS 3
 
 /// @file
 /**
@@ -13,7 +13,7 @@ const int NUM_OF_FLAGS = 3;
 **/
 
 
-int get_square_coeff(Equation* quadratic);
+int GetCoeffFromUser(Equation* quadratic);
 
 /**
  *
@@ -25,6 +25,6 @@ int get_square_coeff(Equation* quadratic);
 **/
 
 
-void print_roots(const Equation* quadratic);
+void PrintRoots(const Equation* quadratic);
 
 #endif

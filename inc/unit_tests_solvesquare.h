@@ -4,7 +4,7 @@
 #include "equation_solve.h"
 
 
-int test_solve_square(void);
+int TestSolveSquare(void);
 
 /**
     @brief Function to convert from int to enum

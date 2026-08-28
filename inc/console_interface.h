@@ -1,76 +1,30 @@
-#ifndef console_interface
-#define console_interface
+#ifndef CONSOLE_INTERFACE
+#define CONSOLE_INTERFACE
+
+#include "equation_solve.h"
+
+#define MAX_SIZE_FILE_NAME 256
+#define NUM_OF_FLAGS       3
 
 enum FlagType
 {
     HELP_FLAG,
     TEST_TEST,
     RUN_FROM_FILE_FLAG
-}
+};
 
 ///@file
 
 /**
-    @brief Structure for console startup flags
-    @param short_flag just short version of the flag
-    @param long_flag just long version of the flag
-    @param func pointer to flag function
-**/
-
-struct Flags 
-{
-    const char* short_name;
-    const char* long_name;
-    const char* info;
-
-    void (*func)(const char* argv[], const int argc, struct Flags arr_with_flags[]);
-};
-
-/**
-    @brief Function for console input from file
-    @param arr_with_flags array of Flags structures
-**/
-
-void input_coeff_by_file(const char* argv[], const int pos, const int argc,
-                         Flags arr_with_flags[], const int NumberOfFlags);
-
-/**
-    @brief Function for normal launch from console
-    @param arr_with_flags array of Flags structures
-**/
-
-void run_from_cli_default(const char* argv[]);
-
-/**
-    @brief Function for outputting documentation on flags
-**/
-
-void print_documentation(const char* argv[],const int pos, const int argc,
-                         Flags arr_with_flags[], const int NumberOfFlags);
-
-/**
-    @brief Function to run all tests
-**/
-
-void all_tests_runner(const char* argv[], const int pos, const int argc,
-                      Flags arr_with_flags[], const int NumberOfFlags);
-
-/**
     @brief Function for normal launch from console
 **/
 
-int run_interactive_default(void);
+int RunInretactiveDefault(void);
 
-/**
-    @brief Function for custom input with flags from console
-    @param argc number of flags entered
-    @param argv array of flag names
-    @param arr_with_flags array of structure containing all flag definitions
-    @param NumberOfFlags constant containing the number of defined flags
-**/
+ErrorStatus CustomRunWithFlags(const int argc, const char const* argv[]);
 
-int custom_run_with_flags(const int argc, const char* argv[],
-                            Flags arr_with_flags[], const int NumberOfFlags);
+void RunAllTest(const char const * argv[], const int arg_pos, 
+                const int argc, Flags flags_arr[]);
 
 #endif
 

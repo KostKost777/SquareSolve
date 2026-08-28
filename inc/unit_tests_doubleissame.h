@@ -1,24 +1,12 @@
-#ifndef unit_tests_doubleissame
-#define unit_tests_doubleissame
+#ifndef UNIT_TESTS_DOUBLE_IS_SAME
+#define UNIT_TESTS_DOUBLE_IS_SAME
+
 ///@file
 
 /**
 **    @brief Function for testing double_is_same function
 **/
 
-int test_double_is_same(void);
-
-/**
-    @brief Structure for testing double using unit tests
-    @param num1 first double number
-    @param num2 second double number
-    @param verdict correct test result
-**/
-
-struct TestSuiteDoubleIsSame {
-    double num1;
-    double num2;
-    bool verdict;
-};
+int TestDoubleIsSame(void);
 
 #endif

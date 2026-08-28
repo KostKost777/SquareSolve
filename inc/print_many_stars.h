@@ -1,5 +1,5 @@
-#ifndef print_stars
-#define print_stars
+#ifndef PRINT_STARS
+#define PRINT_STARS
 
 /// @file
 
@@ -7,5 +7,5 @@
 ** @brief Function for print many stars
 **/
 
-void print_stars_func(void);
+void PrintLineWithStars(void);
 #endif

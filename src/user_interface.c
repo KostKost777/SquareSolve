@@ -1,4 +1,3 @@
-#include <TXLib.h>
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
@@ -7,107 +6,113 @@
 #include "equation_solve.h"
 #include "skipline.h"
 #include "double_operations.h"
-#include "UI.h"
+#include "user_interface.h"
 #include "my_assert.h"
 #include "print_many_stars.h"
 
-///@file
+static int CheckCorrectInput(double* input);
 
-
-/**
-    @brief End of file check function
-**/
-
-
-static int chek_correct_input(double* input);
-
-
-int chek_correct_input(double* input)
+static int CheckCorrectInput(double* input)
 {
-    assert(input != NULL);
+    DETAIL_ASSERT(input != NULL);
 
     int status = scanf("%lf", input);
 
-
-    if (status == -1) {
+    if (status == EOF) 
+    {
         printf("GG WP");
         return -1;
     }
 
     int ch = 0;
 
-    if (status && ((ch = getchar()) == '\n')) {
+    if (status && ((ch = getchar()) == '\n')) 
+    {
         return 0;
     }
 
-    skip_line();
+    SkipLine();
+
     return 1;
 }
 
-int get_square_coeff(Equation* quadratic)
+int GetCoeffFromUser(Equation* quadratic)
 {
-    assert(quadratic != NULL);
-    assert(isfinite(quadratic->coeff.a));
-    assert(isfinite(quadratic->coeff.b));
-    assert(isfinite(quadratic->coeff.c));
+    DETAIL_ASSERT(quadratic != NULL);
 
-    const int NumberOfCoeffs = 3;
+    double a = quadratic->coeff.a;
+    double b = quadratic->coeff.b;
+    double c = quadratic->coeff.c;
+
+    DETAIL_ASSERT(isfinite(a));
+    DETAIL_ASSERT(isfinite(b));
+    DETAIL_ASSERT(isfinite(c));
 
     int  da_ne_bombit_y_menya = 0;
-    char arr_char_coeff[NumberOfCoeffs] = {'a', 'b', 'c'};
-    double* arr_coeff[NumberOfCoeffs] = {&quadratic->coeff.a, &quadratic->coeff.b, &quadratic->coeff.c};
+    char arr_char_coeff[NUM_OF_COEFFS] = {'a', 'b', 'c'};
+    double* arr_coeff[NUM_OF_COEFFS] = {&a, &b, &c};
 
     int counter = 0;
     do {
         if (counter == 0)
-            printf("Введите три действительных коэффицента ax^2 + bx + c через пробел:\n");
+            printf("I can solve this equation ax^2 + bx + c, input coeffs:\n");
 
-        printf("Введите коэффицент %c: ", arr_char_coeff[counter]);
+        printf("Input coeff %c: ", arr_char_coeff[counter]);
 
-        da_ne_bombit_y_menya = chek_correct_input(arr_coeff[counter]);
-        if (da_ne_bombit_y_menya == 1) {
+        da_ne_bombit_y_menya = ISCorrectInput(arr_coeff[counter]);
+
+        if (da_ne_bombit_y_menya == 1) 
+        {
             counter = 0;
             continue;
         }
 
-        if (da_ne_bombit_y_menya == -1) return 1;
+        if (da_ne_bombit_y_menya == -1)
+        {
+            return 1;
+        }
+
         counter++;
 
+    } while(counter !=  NUM_OF_COEFFS);
 
-    } while(counter !=  NumberOfCoeffs);
     return 0;
 }
 
-void print_roots(const Equation* quadratic)
+void PrintRoots(const Equation* quadratic)
 {
-    assert(quadratic != NULL);
-    assert(isfinite((int)quadratic->roots.ans_number_of_x));
-    assert(isfinite(quadratic->roots.x1));
-    assert(isfinite(quadratic->roots.x2));
-    print_stars_func();
+    DETAIL_ASSERT(quadratic);
+    DETAIL_ASSERT(isfinite((int)quadratic->roots.ans_number_of_x));
+    DETAIL_ASSERT(isfinite(quadratic->roots.x1));
+    DETAIL_ASSERT(isfinite(quadratic->roots.x2));
+
+    PrintLineWithStars();
 
     switch (quadratic->roots.ans_number_of_x) {
         case inf_roots:
-            printf("Количество корней бесконечно\n");
+            printf("Infinite rootsn");
             break;
 
         case zero_roots:
-            printf("У этого уравнения нет действительных корней\n");
+            printf("This equation have 0 roots\n");
             break;
 
         case one_roots:
-            printf("У этого уравнения один действительный корень: %lg\n", quadratic->roots.x1);
+            printf("This equation have 1 root: %lg\n", 
+                    quadratic->roots.x1);
             break;
 
         case two_roots:
-            printf("У этого уравнения два действительных корня: \n"
+            printf("This equation have 2 roots: \n"
                    "1) %lg\n2) %lg",
-                                                                quadratic->roots.x1,
-                                                                quadratic->roots.x2);
+                    quadratic->roots.x1,
+                    quadratic->roots.x2);
             break;
 
         default:
-            assert(0 && "Vse ploho");
+            DETAIL_ASSERT(0 && "Vse ploho");
+            break;
      }
-     print_stars_func();
+
+     PrintLineWithStars();
 }

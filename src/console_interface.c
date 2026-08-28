@@ -1,3 +1,5 @@
+///@file
+
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
@@ -15,105 +17,158 @@
 #include "my_assert.h"
 #include "print_many_stars.h"
 
-static int IsHelpFlag(const int argc, const char* argv[], struct Flags flags_arr[]);
+#define STR(to_string) #to_string
 
-static FILE* get_exist_filename(char inp_file_name[]);
+/**
+    @brief Structure for console startup flags
+    @param short_flag just short version of the flag
+    @param long_flag just long version of the flag
+    @param func pointer to flag function
+**/
 
-void InputFromFile(const char* argv[], const int argc, struct Flags flags_arr[]) 
+struct Flags 
 {
+    const char* short_name;
+    const char* long_name;
+    const char* info;
+
+    void (*func)(const char* argv[], const int argc, struct Flags arr_with_flags[]);
+};
+
+static void InputCoeffFromFile(const char const * argv[], const int argc, 
+                        const int arg_pos, Flags flags_arr[]);
+
+static bool IsFileNameInArgs(const int arg_pos, const int argc);
+
+static void RunWithCoeffFromConsole(const char* argv[]);
+
+static void PrintFlagsDocumentation(const char* argv[], const int argc, 
+                                    const int arg_pos, Flags flags_arr[]);
+
+static bool IsGetCoeffFromConsole (int argc, const char const * argv[], Flags flags_arr[]);
+
+static bool IsHelpFlag(const char* flag_name);
+
+static FILE* GetFilePtrFromArgs(char inp_file_name[]);
+
+void InputCoeffFromFile(const char const * argv[], const int argc, 
+                        const int arg_pos, Flags flags_arr[]) 
+{
+    DETAIL_ASSERT(argv);
+    DETAIL_ASSERT(flags_arr);
+
     (void)flags_arr;
 
-    assert(argv != NULL);
-
     FILE* input_file = NULL;
-    const int MAX_SIZE_FILE_NAME = 260;
-    char inp_file_name[MAX_SIZE_FILE_NAME] = "";
 
-    if (pos + 1 > argc - 1)  //˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜ ˜˜ ˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜
-        input_file = get_exist_filename(inp_file_name);
+    char file_name[MAX_SIZE_FILE_NAME] = {};
 
-     else {
-        strncpy(inp_file_name, argv[pos + 1], MAX_SIZE_FILE_NAME);
-        input_file = get_exist_filename(inp_file_name);
+    if (IsFileNameInArgs(arg_pos, argc))
+        input_file = GetFilePtrByName(file_name);
+
+    else 
+    {
+        strncpy(file_name, argv[arg_pos + 1], MAX_SIZE_FILE_NAME);
+        input_file = GetFilePtrByName(file_name);
     }
 
-    assert(input_file != NULL);
+    DETAIL_ASSERT(input_file);
+
     int status = 0;
 
-    while (true) {
-        Equation quadratic_input = {};
+    while (true) 
+    {
+        Equation quadratic = {};
+
         status = fscanf(input_file, "a = %lf b = %lf c = %lf\n",
-                                    &quadratic_input.coeff.a,
-                                    &quadratic_input.coeff.b,
-                                    &quadratic_input.coeff.c);
-        if (status == -1)
-            break;
+                                    &quadratic.coeff.a,
+                                    &quadratic.coeff.b,
+                                    &quadratic.coeff.c);
+        if (status == EOF) break;
 
-        solve_square(&quadratic_input);
-        print_stars_func();
+        SolveSquare(&quadratic);
+
+        PrintLineWithStars();
+
         printf("a = %lg b = %lg c = %lg\n",
-                quadratic_input.coeff.a,
-                quadratic_input.coeff.b,
-                quadratic_input.coeff.c);
+                quadratic.coeff.a,
+                quadratic.coeff.b,
+                quadratic.coeff.c);
 
-        print_roots(&quadratic_input);
+        PrintRoots(&quadratic);
     }
-    print_stars_func();
+
+    PrintLineWithStars();
     fclose(input_file);
 }
 
-void run_from_cli_default(const char* argv[]) {
-    assert(argv != NULL);
-    Equation quadratic_once = {};
+bool IsFileNameInArgs(const int arg_pos, const int argc)
+{
+    return (arg_pos + 1 > argc - 1) ? true : false; 
+}
+
+static void RunWithCoeffFromConsole(const char* argv[]) 
+{
+    DETAIL_ASSERT(argv);
+
+    Equation quadratic = {};
 
     char* endptr_a = NULL;
     char* endptr_b = NULL;
     char* endptr_c = NULL;
-    quadratic_once.coeff.a = strtod(argv[1], &endptr_a);
-    quadratic_once.coeff.b = strtod(argv[2], &endptr_b);
-    quadratic_once.coeff.c = strtod(argv[3], &endptr_c);
+
+    quadratic.coeff.a = strtod(argv[1], &endptr_a);
+    quadratic.coeff.b = strtod(argv[2], &endptr_b);
+    quadratic.coeff.c = strtod(argv[3], &endptr_c);
 
     if ((*endptr_a == '\0') &&
         (*endptr_b == '\0') &&
-        (*endptr_c == '\0')) {
-            solve_square(&quadratic_once);
-            print_roots(&quadratic_once);
-        }
+        (*endptr_c == '\0')) 
+    {
+        SolveSquare(&quadratic);
+        PrintRoots(&quadratic);
+    }
+
     else
-        printf("˜˜ ˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜, ˜˜˜˜˜ -h(--help)\n");
+        printf("Error run with coeffs, use -h(--help)\n");
 
 }
 
-void all_tests_runner(const char* argv[], const int pos, const int argc,
-                      Flags flags_arr[], const int NumberOfFlags){
+void RunAllTest(const char const * argv[], const int arg_pos, 
+                const int argc, Flags flags_arr[]){
     (void)argv;
-    (void)pos;
+    (void)arg_pos;
     (void)argc;
     (void)flags_arr;
-    (void)NumberOfFlags;
 
     int tests_failed = 0;
-    tests_failed += test_solve_square();
-    tests_failed += test_solve_line();
-    tests_failed += test_double_is_same();
-    printf("%d ˜˜˜˜˜˜ ˜ ˜˜˜˜˜˜˜\n", tests_failed);
+
+    tests_failed += TestSolveSquare();
+    tests_failed += TestSolveLine();
+    tests_failed += TestDoubleIsSame();
+
+    printf("%d tests faild\n", tests_failed);
 }
 
-void PrintFlagsDocumentation(const char* argv[], const int argc, struct Flags flags_arr[]) {
+static void PrintFlagsDocumentation(const char* argv[], const int argc, 
+                                    const int arg_pos, Flags flags_arr[]) 
+{
     (void)argv;
     (void)argc;
-    print_stars_func();
+    (void)arg_pos;
 
-    for(int i = 0; i < NUM_OF_FLAGS; ++i){
+    PrintLineWithStars();
+
+    for(int i = 0; i < NUM_OF_FLAGS; ++i)
+    {
         printf("%s\n", flags_arr[i].info);
     }
 
-    printf("˜˜˜˜˜˜˜ ˜˜˜ ˜˜˜˜˜˜ ˜˜˜˜˜ ˜ ˜˜˜ ˜˜˜˜˜˜˜ ˜˜˜˜˜\n");
-    print_stars_func();
-
+    PrintLineWithStars();
 }
 
-int run_interactive_default() {
+int RunInretactiveDefault() 
+{
     Equation quadratic = {};
     int status_EOF = 0;
 
@@ -121,50 +176,60 @@ int run_interactive_default() {
     if (status_EOF)
         return 1;
 
-    solve_square(&quadratic);
-    print_roots(&quadratic);
+    SolveSquare(&quadratic);
+    PrintRoots(&quadratic);
 
     return 0;
 }
 
-int CustomRunWithFlags(const int argc, const char* argv[], struct Flags flags_arr[]) 
+static bool IsGetCoeffFromConsole (int argc, const char const * argv[], Flags flags_arr[])
 {
-
-    const int DefaultInputNumbers = 4;
-
-    if(IsUserUseHelpFlag(argc, argv, flags_arr))
-        return 1;
-
-    if (argc == DefaultInputNumbers){
-            run_from_cli_default(argv);
-            return 0;
+    if (argc != 4) return false;
+    
+    for (int i = 0; i < NUM_OF_FLAGS; ++i)
+    {
+        if ((strcmp(argv[arg_pos], flags_arr[fl_pos].short_flag) == 0) ||
+            (strcmp(argv[arg_pos], flags_arr[fl_pos].long_flag)  == 0))
+        {
+            return false;
+        }
     }
-    for (int pos = 1; pos < argc; ++pos) {
-        for (int fl_pos = 0; fl_pos < NumberOfFlags; fl_pos++) {
-            if ((strcmp(argv[pos], flags_arr[fl_pos].short_flag) == 0) ||
-                (strcmp(argv[pos], flags_arr[fl_pos].long_flag)  == 0)){
-                flags_arr[fl_pos].func(argv, pos, argc,
-                                            flags_arr, NumberOfFlags);
+
+    return true;
+}
+
+ErrorStatus CustomRunWithFlags(const int argc, const char const* argv[]) 
+{
+    DETAIL_ASSERT(argv);
+
+    const char* H_DOC = "-h (--help):               Ð¿Ð¾ÑÐ¼Ð¾Ñ‚Ñ€ÐµÑ‚ÑŒ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°Ñ†Ð¸ÑŽ Ð¿Ð¾ Ñ„Ð»Ð°Ð³Ð°Ð¼.\n";
+    const char* F_DOC = "-t (--tests):              Ð·Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚ÑŒ Ñ‚ÐµÑÑ‚Ñ‹.                  \n";
+    const char* T_DOC = "-f (--file) file_name.txt: Ð·Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñƒ Ð¸Ð· Ñ„Ð°Ð¹Ð»Ð°.     \n";
+
+    Flags flags_arr[] = 
+    { 
+        { "-h", "--help",       H_DOC, PrintFlagsDocumentation  },
+        { "-f", "--from_file",  F_DOC, InputCoeffFromFile       },
+        { "-t", "--tests",      T_DOC, RunAllTest               }
+    };
+
+    if (IsGetCoeffFromConsole(argc, argv, flags_arr))
+    {
+        RunWithCoeffFromConsole(argv);
+        return SUCCESS;
+    }
+
+    for (int arg_pos = 1; arg_pos < argc; arg_pos++) 
+    {
+        for (int fl_pos = 0; fl_pos < NUM_OF_FLAGS; fl_pos++) 
+        {
+            if ((strcmp(argv[arg_pos], flags_arr[fl_pos].short_flag) == 0) ||
+                (strcmp(argv[arg_pos], flags_arr[fl_pos].long_flag)  == 0)){
+                flags_arr[fl_pos].func(argv, argc, arg_pos, flags_arr);
             }
         }
     }
     return 0;
-}
-
-static bool IsUserUseHelpFlag(const int argc, const char* argv[], struct Flags flags_arr[])
-{
-    DETAIL_ASSERT(flags_arr);
-    DETAIL_ASSERT(argv);
-
-    for (int i = 1; i < argc; ++i) 
-    {
-        if (IsHelpFlag(argv[i]))
-        {
-            flags_arr[HELP_FLAG].func(argv, argc, flags_arr);
-            return true;
-        }
-    }
-    return false;
 }
 
 static bool IsHelpFlag(const char* flag_name)
@@ -172,13 +237,18 @@ static bool IsHelpFlag(const char* flag_name)
     return strcmp(flag_name, "-h") == 0 || strcmp(flag_name, "--help") == 0;
 }
 
-static FILE* get_exist_filename(char inp_file_name[]){
-    assert(inp_file_name != NULL);
+static FILE* GetFilePtrFromArgs(char inp_file_name[])
+{
+    DETAIL_ASSERT(inp_file_name != NULL);
     FILE* input_file = fopen(inp_file_name, "r");
-    while(input_file == NULL){
-        printf("˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜:  ");
-        scanf("%260s", inp_file_name);
+
+    while(input_file == NULL)
+    {
+        printf("Input exist file name:  ");
+        scanf("%" STR(MAX_SIZE_FILE_NAME) "s", inp_file_name);
+
         input_file = fopen(inp_file_name, "r");
     }
+
     return input_file;
 }

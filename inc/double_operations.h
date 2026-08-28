@@ -1,5 +1,5 @@
-#ifndef double_operations
-#define double_operations
+#ifndef DOUBLE_OPERATIONS
+#define DOUBLE_OPERATIONS
 
 ///@file
 
@@ -16,7 +16,7 @@ const double EPS = 1E-7;
 * @param num2 second number
 **/
 
-bool double_is_same(double num1, double num2);
+bool IsDoubleSame(double num1, double num2);
 
 
 /**
@@ -25,7 +25,7 @@ bool double_is_same(double num1, double num2);
 * @param num number to check
 **/
 
-void remove_minus_zero(double* num);
+void RemovMinusZero(double* num);
 
 /**
  *
@@ -34,7 +34,7 @@ void remove_minus_zero(double* num);
 * @param num2 potentially less double
 **/
 
-bool comparison_of_double(double num1, double num2);
+bool IsDoubleBigger(double num1, double num2);
 
 
 #endif

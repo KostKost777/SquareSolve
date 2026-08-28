@@ -17,25 +17,15 @@
 
 int main(const int argc, const char* argv[])
 {
-    const char* H_DOC = "-h (--help):               посмотреть документацию по флагам.\n";
-    const char* F_DOC = "-t (--tests):              запустить тесты.\n";
-    const char* T_DOC = "-f (--file) file_name.txt: запустить программу из файла.\n";
-
-    struct Flags arr_with_flags[] = {{"-h", "--help",  H_DOC, print_documentation},
-                                     {"-f", "--help",  F_DOC, input_coeff_by_file, },
-                                     {"-t", "--tests", T_DOC, all_tests_runner}};
-
     if (argc > 1)
     {
-        if (custom_run_with_flags(argc, argv, arr_with_flags))
+        if (CustomRunWithFlags(argc, argv))
             return EXIT_SUCCESS;
     }
 
-    else 
-    {
-        if (run_interactive_default())
-            return EXIT_SUCCESS;
-    }
+
+    if (RunInretactiveDefault())
+        return EXIT_SUCCESS;
 
     return EXIT_FAILURE;
 }

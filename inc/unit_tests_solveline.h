@@ -6,6 +6,6 @@
 **    @brief Function for testing line equation function
 **/
 
-int test_solve_line();
+int TestSolveLine();
 
 #endif

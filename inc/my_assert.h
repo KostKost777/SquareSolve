@@ -1,29 +1,30 @@
-#ifndef my_assert
-#define my_assert
+#ifndef MY_ASSERT
+#define MY_ASSERT
 
 #ifndef NMA
+
 #define DETAIL_ASSERT(condition)                            \
 if (!(condition))                                             \
 {                                                            \
-    printf( "Детальный Assert:\n"                            \
-            "в файле %s\n"                                  \
-            "в функции %s\n"                                \
-            "на %d строке\n"                                 \
-            "проваленное условие: " #condition           \
-            "\nпринудительный останов\n",                      \
+    printf( "Deatil Assert:\n"                            \
+            "In File %s\n"                                  \
+            "In Func %s\n"                                \
+            "on %d line\n"                                 \
+            "wrong expression: " #condition           \
+            "\naborting...\n",                      \
              __FILE__, __PRETTY_FUNCTION__, __LINE__);      \                                                 \
 }
 
 #define FUNCTIONAL_ASSERT(condition, action)                \
 if (!(condition))                                           \
 {                                                            \
-    printf( "Функциональный Assert:\n"                            \
-            "в файле %s\n"                                  \
-            "в функции %s\n"                                \
-            "на %d строке\n"                                 \
-            "проваленное условие: " #condition           \
-            "\nвыполняемое действие: " #action                 \
-            "\nпринудительный останов\n",                      \
+    printf( "Functional Assert:\n"                            \
+            "In File %s\n"                                  \
+            "In Func %s\n"                                \
+            "on %d line\n"                                 \
+            "wrong expression: " #condition           \
+            "\nDone action: " #action                 \
+            "\naborting...\n",                      \
              __FILE__, __PRETTY_FUNCTION__, __LINE__);      \
     action;                                                 \
 }
@@ -34,4 +35,4 @@ if (!(condition))                                           \
 #define FUNCTIONAL_ASSERT(condition, action)
 
 #endif NMA
-#endif my_assert
+#endif MY_ASSERT
