@@ -12,7 +12,7 @@ if (!(condition))                                             \
             "on %d line\n"                                 \
             "wrong expression: " #condition           \
             "\naborting...\n",                      \
-             __FILE__, __PRETTY_FUNCTION__, __LINE__);      \                                                 \
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);                                               \
 }
 
 #define FUNCTIONAL_ASSERT(condition, action)                \
@@ -34,5 +34,5 @@ if (!(condition))                                           \
 #define DETAIL_ASSERT(condition)
 #define FUNCTIONAL_ASSERT(condition, action)
 
-#endif NMA
-#endif MY_ASSERT
+#endif
+#endif

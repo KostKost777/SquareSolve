@@ -14,8 +14,8 @@ int TestSolveSquare()
 
     FILE *file_test = NULL;
 
-    file_test = fopen("TestSolveSquare.txt", "r");
-    DETAIL_ASSERT(file_test != NULL);
+    file_test = fopen("unit_tests/TestSolveSquare.txt", "r");
+    DETAIL_ASSERT(file_test);
 
     int tests_failed = 0;
 
@@ -34,7 +34,7 @@ int TestSolveSquare()
                                     &answer.roots.x2);
         if (status == EOF) break;
 
-        answer.roots.ans_number_of_x = convert_from_int(answer_n_roots);
+        answer.roots.ans_number_of_x = ConvertNumOfRootsEnum(answer_n_roots);
         quadratic_test = answer;
 
         SolveSquare(&quadratic_test);
@@ -63,7 +63,7 @@ int TestSolveSquare()
     }
 
     fclose(file_test);
-    
+
     return tests_failed;
 }
 

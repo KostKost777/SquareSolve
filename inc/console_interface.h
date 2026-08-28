@@ -13,6 +13,16 @@ enum FlagType
     RUN_FROM_FILE_FLAG
 };
 
+struct Flags 
+{
+    const char* short_name;
+    const char* long_name;
+    const char* info;
+
+    void (*func)(const char* const argv[], const int argc, 
+                 const int arg_pos, struct Flags arr_with_flags[]);
+};
+
 ///@file
 
 /**
@@ -21,10 +31,12 @@ enum FlagType
 
 int RunInretactiveDefault(void);
 
-ErrorStatus CustomRunWithFlags(const int argc, const char const* argv[]);
+ErrorStatus CustomRunWithFlags(const int argc, const char* const argv[]);
 
-void RunAllTest(const char const * argv[], const int arg_pos, 
+void RunAllTest(const char* const argv[], const int arg_pos, 
                 const int argc, Flags flags_arr[]);
+
+FILE* GetFilePtrByName(char inp_file_name[]);
 
 #endif
 

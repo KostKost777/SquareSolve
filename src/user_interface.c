@@ -59,7 +59,7 @@ int GetCoeffFromUser(Equation* quadratic)
 
         printf("Input coeff %c: ", arr_char_coeff[counter]);
 
-        da_ne_bombit_y_menya = ISCorrectInput(arr_coeff[counter]);
+        da_ne_bombit_y_menya = CheckCorrectInput(arr_coeff[counter]);
 
         if (da_ne_bombit_y_menya == 1) 
         {
@@ -76,21 +76,27 @@ int GetCoeffFromUser(Equation* quadratic)
 
     } while(counter !=  NUM_OF_COEFFS);
 
+    quadratic->coeff.a = a;
+    quadratic->coeff.b = b;
+    quadratic->coeff.c = c;
+
     return 0;
 }
 
 void PrintRoots(const Equation* quadratic)
 {
     DETAIL_ASSERT(quadratic);
+
     DETAIL_ASSERT(isfinite((int)quadratic->roots.ans_number_of_x));
     DETAIL_ASSERT(isfinite(quadratic->roots.x1));
     DETAIL_ASSERT(isfinite(quadratic->roots.x2));
 
     PrintLineWithStars();
 
-    switch (quadratic->roots.ans_number_of_x) {
+    switch (quadratic->roots.ans_number_of_x) 
+    {
         case inf_roots:
-            printf("Infinite rootsn");
+            printf("Infinite roots");
             break;
 
         case zero_roots:

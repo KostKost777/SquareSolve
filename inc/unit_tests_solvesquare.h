@@ -10,7 +10,7 @@ int TestSolveSquare(void);
     @brief Function to convert from int to enum
 **/
 
-NumberOfRoots convert_from_int(int num);
+NumOfRoots convert_from_int(int num);
 
 
 #endif

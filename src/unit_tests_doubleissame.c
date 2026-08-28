@@ -27,7 +27,7 @@ int TestDoubleIsSame()
 {
     FILE *file_test = NULL;
 
-    file_test = fopen("TestDoubleIsSame.txt", "r");
+    file_test = fopen("unit_tests/TestDoubleIsSame.txt", "r");
     DETAIL_ASSERT(file_test != NULL);
     
     int tests_failed = 0;

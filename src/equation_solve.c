@@ -21,14 +21,18 @@ void SolveSquare(Equation* quadratic)
     DETAIL_ASSERT(isfinite(b));
     DETAIL_ASSERT(isfinite(c));
 
-    if (IsDoubleSame(a, 0))  // a = 0
+
+    if (IsDoubleSame(a, 0))   // a = 0
+    {
         SolveLine(quadratic);
         return;
+    } 
 
+        
     if (IsDoubleSame(c, 0)) // c = 0
     {           
-        quadratic->roots.x1 = max(0.0, -b / a);
-        quadratic->roots.x2 = min(0.0, -b / a);
+        quadratic->roots.x1 = fmax(0.0, -b / a);
+        quadratic->roots.x2 = fmin(0.0, -b / a);
 
         RemovMinusZero(&quadratic->roots.x1);
         RemovMinusZero(&quadratic->roots.x2);
@@ -63,10 +67,10 @@ void SolveSquare(Equation* quadratic)
     {
         double sqrt_dis = sqrt(dis);
 
-        quadratic->roots.x1 = max((-b + sqrt_dis) / (2 * a),
+        quadratic->roots.x1 = fmax((-b + sqrt_dis) / (2 * a),
                                   (-b - sqrt_dis) / (2 * a));
 
-        quadratic->roots.x2 = min((-b + sqrt_dis) / (2 * a),
+        quadratic->roots.x2 = fmin((-b + sqrt_dis) / (2 * a),
                                   (-b - sqrt_dis) / (2 * a));
 
         RemovMinusZero(&quadratic->roots.x1);
@@ -121,20 +125,20 @@ void SolveLine(Equation* quadratic)
     }
 }
 
-NumberOfRoots ConvertNumOfRootsEnum(int num)
+NumOfRoots ConvertNumOfRootsEnum(int num)
 {
     switch(num)
     {
         case inf_roots:
             return inf_roots;
 
-        case 0:
+        case zero_roots:
             return zero_roots;
 
-        case 1:
+        case one_roots:
             return one_roots;
 
-        case 2:
+        case two_roots:
             return two_roots;
 
         default:

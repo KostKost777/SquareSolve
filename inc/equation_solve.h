@@ -3,36 +3,39 @@
 
 #define NUM_OF_COEFFS 3
 
-enum NumOfRoots
+typedef enum
 {
     inf_roots = -1,
     zero_roots,
     one_roots,
     two_roots
-};
+} NumOfRoots;
 
-struct Roots{
+typedef struct
+{
     double x1;
     double x2;
     NumOfRoots ans_number_of_x;
-};
+} Roots;
 
-struct Coeffs {
+typedef struct
+{
     double a;
     double b;
     double c;
-};
+} Coeffs;
 
-struct Equation {
+typedef struct
+ {
     Roots roots;
     Coeffs coeff;
-};
+} Equation;
 
-enum ErrorStatus
+typedef enum 
 {
     SUCCESS,
     ERROR
-};
+} ErrorStatus;
 
 /**
  *
@@ -55,6 +58,6 @@ void SolveSquare(Equation* quadratic);
 
 void SolveLine(Equation *quadratic);
 
-NumberOfRoots ConvertNumOfRootsEnum(int num);
+NumOfRoots ConvertNumOfRootsEnum(int num);
 
 #endif

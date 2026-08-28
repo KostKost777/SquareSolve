@@ -17,41 +17,31 @@
 #include "my_assert.h"
 #include "print_many_stars.h"
 
-#define STR(to_string) #to_string
+#define STR_HELPER(to_string) #to_string
+#define STR(to_string) STR_HELPER(to_string)
 
 /**
     @brief Structure for console startup flags
-    @param short_flag just short version of the flag
-    @param long_flag just long version of the flag
+    @param short_name just short version of the flag
+    @param long_name just long version of the flag
     @param func pointer to flag function
 **/
 
-struct Flags 
-{
-    const char* short_name;
-    const char* long_name;
-    const char* info;
-
-    void (*func)(const char* argv[], const int argc, struct Flags arr_with_flags[]);
-};
-
-static void InputCoeffFromFile(const char const * argv[], const int argc, 
+static void InputCoeffFromFile(const char* const argv[], const int argc, 
                         const int arg_pos, Flags flags_arr[]);
 
 static bool IsFileNameInArgs(const int arg_pos, const int argc);
 
-static void RunWithCoeffFromConsole(const char* argv[]);
+static void RunWithCoeffFromConsole(const char* const argv[]);
 
-static void PrintFlagsDocumentation(const char* argv[], const int argc, 
+static void PrintFlagsDocumentation(const char* const argv[], const int argc, 
                                     const int arg_pos, Flags flags_arr[]);
 
-static bool IsGetCoeffFromConsole (int argc, const char const * argv[], Flags flags_arr[]);
+static bool IsGetCoeffFromConsole (int argc, const char* const argv[], Flags flags_arr[]);
 
-static bool IsHelpFlag(const char* flag_name);
+FILE* GetFilePtrFromArgs(char inp_file_name[]);
 
-static FILE* GetFilePtrFromArgs(char inp_file_name[]);
-
-void InputCoeffFromFile(const char const * argv[], const int argc, 
+void InputCoeffFromFile(const char* const argv[], const int argc, 
                         const int arg_pos, Flags flags_arr[]) 
 {
     DETAIL_ASSERT(argv);
@@ -107,7 +97,8 @@ bool IsFileNameInArgs(const int arg_pos, const int argc)
     return (arg_pos + 1 > argc - 1) ? true : false; 
 }
 
-static void RunWithCoeffFromConsole(const char* argv[]) 
+
+static void RunWithCoeffFromConsole(const char* const argv[])
 {
     DETAIL_ASSERT(argv);
 
@@ -134,7 +125,7 @@ static void RunWithCoeffFromConsole(const char* argv[])
 
 }
 
-void RunAllTest(const char const * argv[], const int arg_pos, 
+void RunAllTest(const char* const argv[], const int arg_pos, 
                 const int argc, Flags flags_arr[]){
     (void)argv;
     (void)arg_pos;
@@ -150,7 +141,7 @@ void RunAllTest(const char const * argv[], const int arg_pos,
     printf("%d tests faild\n", tests_failed);
 }
 
-static void PrintFlagsDocumentation(const char* argv[], const int argc, 
+static void PrintFlagsDocumentation(const char* const argv[], const int argc, 
                                     const int arg_pos, Flags flags_arr[]) 
 {
     (void)argv;
@@ -172,7 +163,8 @@ int RunInretactiveDefault()
     Equation quadratic = {};
     int status_EOF = 0;
 
-    status_EOF = get_square_coeff(&quadratic);
+    status_EOF = GetCoeffFromUser(&quadratic);
+
     if (status_EOF)
         return 1;
 
@@ -182,14 +174,14 @@ int RunInretactiveDefault()
     return 0;
 }
 
-static bool IsGetCoeffFromConsole (int argc, const char const * argv[], Flags flags_arr[])
+static bool IsGetCoeffFromConsole (int argc, const char* const argv[], Flags flags_arr[])
 {
     if (argc != 4) return false;
     
     for (int i = 0; i < NUM_OF_FLAGS; ++i)
     {
-        if ((strcmp(argv[arg_pos], flags_arr[fl_pos].short_flag) == 0) ||
-            (strcmp(argv[arg_pos], flags_arr[fl_pos].long_flag)  == 0))
+        if ((strcmp(argv[1], flags_arr[i].short_name) == 0) ||
+            (strcmp(argv[1], flags_arr[i].long_name)  == 0))
         {
             return false;
         }
@@ -198,7 +190,7 @@ static bool IsGetCoeffFromConsole (int argc, const char const * argv[], Flags fl
     return true;
 }
 
-ErrorStatus CustomRunWithFlags(const int argc, const char const* argv[]) 
+ErrorStatus CustomRunWithFlags(const int argc, const char* const argv[]) 
 {
     DETAIL_ASSERT(argv);
 
@@ -223,21 +215,17 @@ ErrorStatus CustomRunWithFlags(const int argc, const char const* argv[])
     {
         for (int fl_pos = 0; fl_pos < NUM_OF_FLAGS; fl_pos++) 
         {
-            if ((strcmp(argv[arg_pos], flags_arr[fl_pos].short_flag) == 0) ||
-                (strcmp(argv[arg_pos], flags_arr[fl_pos].long_flag)  == 0)){
+            if ((strcmp(argv[arg_pos], flags_arr[fl_pos].short_name) == 0) ||
+                (strcmp(argv[arg_pos], flags_arr[fl_pos].long_name)  == 0)){
                 flags_arr[fl_pos].func(argv, argc, arg_pos, flags_arr);
             }
         }
     }
-    return 0;
+
+    return SUCCESS;
 }
 
-static bool IsHelpFlag(const char* flag_name)
-{
-    return strcmp(flag_name, "-h") == 0 || strcmp(flag_name, "--help") == 0;
-}
-
-static FILE* GetFilePtrFromArgs(char inp_file_name[])
+FILE* GetFilePtrByName(char inp_file_name[])
 {
     DETAIL_ASSERT(inp_file_name != NULL);
     FILE* input_file = fopen(inp_file_name, "r");
